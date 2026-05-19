@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>حجز الطلب</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyB0qZXj1UeBghJVlZH7IP_a5VURaKHr5lA",
+      authDomain: "ahmed-8d4a3.firebaseapp.com",
+      projectId: "ahmed-8d4a3",
+      storageBucket: "ahmed-8d4a3.firebasestorage.app",
+      messagingSenderId: "604078993540",
+      appId: "1:604078993540:web:02bce438c5115be325d2d1"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    window._db = db;
+    window._storage = storage;
+    window._addDoc = addDoc;
+    window._collection = collection;
+    window._serverTimestamp = serverTimestamp;
+    window._storageRef = ref;
+    window._uploadBytes = uploadBytes;
+    window._getDownloadURL = getDownloadURL;
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --teal:#4a9b8f;--teal-lt:#6fb8ad;--teal-dk:#2e7a6e;
+      --teal-pale:#e4f4f1;--teal-soft:#c8e9e4;
+      --cream:#faf9f6;--warm:#f4f1ec;--sand:#e8e0d4;--sand-lt:#c0b4a4;
+      --ink:#1e2d2a;--ink-mid:#3d5450;--muted:#647872;--faint:#9db4af;
+      --err:#d05050;--ok:#3dbf80;
+      --sh:0 2px 20px rgba(46,122,110,.09);--sh-lg:0 8px 40px rgba(46,122,110,.14);
+      --r:18px;--r-sm:12px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Cairo',sans-serif;background:var(--cream);color:var(--ink);}
+    ::-webkit-scrollbar{width:5px;}
+    ::-webkit-scrollbar-thumb{background:var(--teal-lt);border-radius:3px;}
+
+    /* NAV */
+    header{
+      position:sticky;top:0;z-index:99;background:rgba(250,249,246,.95);
+      backdrop-filter:blur(20px);border-bottom:1px solid rgba(74,155,143,.13);
+      height:72px;display:flex;align-items:center;padding:0 6%;justify-content:space-between;
+    }
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .lm{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--teal-dk),var(--teal-lt));display:flex;align-items:center;justify-content:center;font-family:'Tajawal',sans-serif;font-size:1.1rem;font-weight:900;color:#fff;box-shadow:0 4px 12px rgba(74,155,143,.3);}
+    .lt{font-family:'Tajawal',sans-serif;font-size:1.5rem;font-weight:900;color:var(--teal-dk);}
+    nav{display:flex;gap:4px;}
+    nav a{text-decoration:none;color:var(--muted);font-size:.9rem;font-weight:500;padding:8px 16px;border-radius:30px;transition:.25s;}
+    nav a:hover,nav a.act{color:var(--teal-dk);background:var(--teal-pale);}
+    nav a.act{font-weight:700;}
+    .hcta{background:var(--teal);color:#fff;padding:10px 24px;border-radius:30px;font-weight:700;font-size:.9rem;text-decoration:none;transition:.3s;}
+    .hcta:hover{background:var(--teal-dk);}
+    .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;}
+    .burger span{display:block;width:24px;height:2px;background:var(--ink-mid);border-radius:2px;}
+    .mnav{display:none;position:fixed;top:72px;inset-inline:0;background:var(--cream);border-bottom:1px solid var(--sand);padding:12px 6%;flex-direction:column;gap:4px;z-index:98;box-shadow:0 8px 24px rgba(0,0,0,.07);}
+    .mnav.open{display:flex;}
+    .mnav a{text-decoration:none;color:var(--muted);font-size:.95rem;padding:11px 14px;border-radius:var(--r-sm);transition:.2s;}
+    .mnav a:hover{background:var(--teal-pale);color:var(--teal-dk);}
+
+    /* PAGE HEADER */
+    .ph{background:linear-gradient(135deg,var(--teal-dk) 0%,var(--teal) 100%);padding:48px 6%;color:#fff;}
+    .ph-in{max-width:900px;margin:0 auto;}
+    .ph h1{font-family:'Tajawal',sans-serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;}
+    .ph p{margin-top:8px;opacity:.85;font-size:.97rem;line-height:1.7;}
+
+    /* PROGRESS STEPS */
+    .steps-bar{background:#fff;border-bottom:1px solid var(--sand);padding:20px 6%;position:sticky;top:72px;z-index:90;}
+    .steps-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:0;}
+    .step-item{display:flex;align-items:center;gap:10px;flex:1;position:relative;}
+    .step-item:not(:last-child)::after{content:'';flex:1;height:2px;background:var(--sand);margin:0 8px;}
+    .step-circle{width:34px;height:34px;border-radius:50%;flex-shrink:0;border:2px solid var(--sand);background:#fff;color:var(--sand-lt);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;transition:.3s;}
+    .step-item.done .step-circle{background:var(--teal);border-color:var(--teal);color:#fff;}
+    .step-item.active .step-circle{background:var(--teal-pale);border-color:var(--teal);color:var(--teal-dk);}
+    .step-lbl{font-size:.78rem;font-weight:600;color:var(--faint);white-space:nowrap;}
+    .step-item.active .step-lbl,.step-item.done .step-lbl{color:var(--teal-dk);}
+
+    /* LAYOUT */
+    .page-body{max-width:900px;margin:0 auto;padding:32px 6% 80px;display:grid;grid-template-columns:1fr 300px;gap:24px;}
+
+    /* FORM CARD */
+    .card{background:#fff;border-radius:var(--r);border:1px solid rgba(74,155,143,.10);box-shadow:var(--sh);overflow:hidden;}
+    .ch{padding:18px 24px 14px;border-bottom:1px solid rgba(74,155,143,.10);display:flex;align-items:center;gap:10px;}
+    .ch-ic{width:36px;height:36px;border-radius:10px;background:var(--teal-pale);display:flex;align-items:center;justify-content:center;font-size:1rem;}
+    .ch h3{font-size:.95rem;font-weight:700;color:var(--ink);}
+    .cb{padding:22px 24px;}
+
+    /* EMPLOYEE SELECT */
+    .emp-opts{display:flex;flex-direction:column;gap:10px;}
+    .emp-opt{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--r-sm);border:1.5px solid var(--sand);background:var(--warm);cursor:pointer;transition:.25s;}
+    .emp-opt:hover{border-color:var(--teal-lt);background:var(--teal-pale);}
+    .emp-opt.sel{border-color:var(--teal);background:var(--teal-pale);}
+    .empa{width:46px;height:46px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,var(--teal-soft),var(--teal-lt));display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
+    .empi{flex:1;}
+    .empi h4{font-size:.9rem;font-weight:700;color:var(--ink);}
+    .empi p{font-size:.76rem;color:var(--muted);margin-top:2px;}
+    .emp-badge{background:var(--teal-pale);color:var(--teal-dk);font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:4px;display:inline-block;}
+    .emp-radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--sand-lt);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.25s;}
+    .emp-opt.sel .emp-radio{border-color:var(--teal);background:var(--teal);}
+    .emp-radio::after{content:'';width:7px;height:7px;border-radius:50%;background:#fff;opacity:0;}
+    .emp-opt.sel .emp-radio::after{opacity:1;}
+
+    /* SERVICE TYPE */
+    .svc-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .svc-opt{padding:16px 10px;border-radius:var(--r-sm);border:1.5px solid var(--sand);background:var(--warm);cursor:pointer;text-align:center;transition:.25s;}
+    .svc-opt:hover{border-color:var(--teal-lt);}
+    .svc-opt.sel{border-color:var(--teal);background:var(--teal-pale);}
+    .svc-icon{font-size:1.4rem;margin-bottom:6px;}
+    .svc-opt h5{font-size:.82rem;font-weight:700;color:var(--ink);}
+    .svc-opt p{font-size:.7rem;color:var(--muted);margin-top:2px;}
+
+    /* PURCHASE REQUEST (multi-select checkboxes) */
+    .purchase-opts{display:flex;flex-wrap:wrap;gap:10px;}
+    .pur-opt{
+      display:flex;align-items:center;gap:8px;padding:10px 16px;
+      border-radius:var(--r-sm);border:1.5px solid var(--sand);
+      background:var(--warm);cursor:pointer;transition:.25s;font-size:.85rem;font-weight:600;color:var(--ink);
+    }
+    .pur-opt:hover{border-color:var(--teal-lt);background:var(--teal-pale);}
+    .pur-opt.sel{border-color:var(--teal);background:var(--teal-pale);color:var(--teal-dk);}
+    .pur-chk{width:18px;height:18px;border-radius:5px;border:2px solid var(--sand-lt);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.25s;font-size:.65rem;color:#fff;}
+    .pur-opt.sel .pur-chk{border-color:var(--teal);background:var(--teal);}
+
+    /* FORM FIELDS */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .fg-full{grid-column:1/-1;}
+    .fgroup{display:flex;flex-direction:column;gap:6px;}
+    label{font-size:.8rem;font-weight:700;color:var(--muted);}
+    label .req{color:var(--err);margin-right:2px;}
+    input,select,textarea{
+      padding:12px 14px;border:1.5px solid var(--sand);border-radius:var(--r-sm);
+      background:var(--warm);font-family:'Cairo',sans-serif;font-size:.9rem;color:var(--ink);
+      outline:none;transition:.25s;width:100%;
+      -webkit-appearance:none;appearance:none;
+      touch-action:manipulation;
+    }
+    input:focus,select:focus,textarea:focus{border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px rgba(74,155,143,.12);}
+    input.err,select.err{border-color:var(--err);}
+    .err-msg{font-size:.72rem;color:var(--err);margin-top:3px;display:none;}
+    .err-msg.show{display:block;}
+    textarea{resize:vertical;min-height:80px;}
+
+
+    /* MEASUREMENTS SECTION */
+    .meas-title{font-size:.82rem;font-weight:700;color:var(--teal-dk);padding:10px 0 6px;border-top:1px dashed rgba(74,155,143,.2);margin-top:6px;grid-column:1/-1;display:flex;align-items:center;gap:6px;}
+    .meas-title::before{content:'📐';font-size:.9rem;}
+
+    /* DELIVERY OPTIONS */
+    .delivery-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .dlv-opt{
+      display:flex;align-items:center;gap:12px;padding:14px 16px;
+      border-radius:var(--r-sm);border:1.5px solid var(--sand);
+      background:var(--warm);cursor:pointer;transition:.25s;
+    }
+    .dlv-opt:hover{border-color:var(--teal-lt);background:var(--teal-pale);}
+    .dlv-opt.sel{border-color:var(--teal);background:var(--teal-pale);}
+    .dlv-ico{font-size:1.4rem;flex-shrink:0;}
+    .dlv-info h5{font-size:.85rem;font-weight:700;color:var(--ink);}
+    .dlv-info p{font-size:.72rem;color:var(--muted);margin-top:2px;}
+    .dlv-radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--sand-lt);flex-shrink:0;margin-right:auto;display:flex;align-items:center;justify-content:center;transition:.25s;}
+    .dlv-opt.sel .dlv-radio{border-color:var(--teal);background:var(--teal);}
+    .dlv-radio::after{content:'';width:7px;height:7px;border-radius:50%;background:#fff;opacity:0;}
+    .dlv-opt.sel .dlv-radio::after{opacity:1;}
+
+    /* RENT DATE */
+    .rent-section{display:flex;flex-direction:column;gap:14px;}
+    .date-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .date-group{display:flex;flex-direction:column;gap:6px;}
+    .date-group label{font-size:.8rem;font-weight:700;color:var(--muted);}
+    .date-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+    /* SIDEBAR */
+    .sidebar{display:flex;flex-direction:column;gap:16px;position:sticky;top:160px;height:fit-content;}
+    .sum-card{background:#fff;border-radius:var(--r);border:1px solid rgba(74,155,143,.10);box-shadow:var(--sh);padding:22px;}
+    .sum-card h3{font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:16px;}
+    .sum-row{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid rgba(74,155,143,.08);}
+    .sum-row:last-of-type{border-bottom:none;}
+    .sum-ico{font-size:.95rem;margin-top:1px;flex-shrink:0;}
+    .sum-lbl{font-size:.72rem;color:var(--faint);}
+    .sum-val{font-size:.88rem;font-weight:600;color:var(--ink);margin-top:2px;}
+    .sum-val.pend{color:var(--sand-lt);font-style:italic;font-weight:400;font-size:.8rem;}
+    .price-box{background:var(--teal-pale);border-radius:var(--r-sm);padding:14px;margin-top:14px;}
+    .pr{display:flex;justify-content:space-between;font-size:.83rem;color:var(--muted);padding:2px 0;}
+    .pr.tot{border-top:1px solid rgba(74,155,143,.2);margin-top:8px;padding-top:10px;font-weight:700;color:var(--ink);font-size:.97rem;}
+    .submit-btn{width:100%;margin-top:16px;padding:15px;background:var(--teal);color:#fff;border:none;border-radius:30px;font-family:'Cairo',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:0 5px 18px rgba(74,155,143,.36);transition:.3s;}
+    .submit-btn:hover{background:var(--teal-dk);transform:translateY(-1px);}
+    .submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+    .trust-list{margin-top:14px;display:flex;flex-direction:column;gap:8px;}
+    .ti{display:flex;align-items:center;gap:8px;font-size:.76rem;color:var(--muted);}
+    .ti-ic{color:var(--teal);}
+
+    /* SUCCESS MODAL */
+    .modal-ov{position:fixed;inset:0;background:rgba(20,40,35,.55);backdrop-filter:blur(8px);z-index:1000;display:none;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;}
+    .modal-ov.open{display:flex;}
+    .modal{background:#fff;border-radius:24px;padding:32px 28px;max-width:480px;width:100%;text-align:center;animation:popIn .4s cubic-bezier(.34,1.56,.64,1) both;margin:auto;}
+    @keyframes popIn{from{opacity:0;transform:scale(.88);}to{opacity:1;transform:none;}}
+    .modal-icon{width:84px;height:84px;border-radius:50%;margin:0 auto 22px;background:linear-gradient(135deg,var(--teal-soft),var(--teal-lt));display:flex;align-items:center;justify-content:center;font-size:2.4rem;}
+    .modal h2{font-family:'Tajawal',sans-serif;font-size:1.7rem;font-weight:900;color:var(--ink);}
+    .modal p{color:var(--muted);margin-top:10px;font-size:.95rem;line-height:1.7;}
+    .booking-num{background:var(--teal-pale);border-radius:var(--r-sm);padding:12px 20px;margin:18px 0;font-size:.85rem;color:var(--muted);}
+    .booking-num strong{color:var(--teal-dk);font-size:1rem;display:block;margin-top:4px;font-family:'Tajawal',sans-serif;}
+    .modal-details{text-align:right;background:var(--warm);border-radius:var(--r-sm);padding:14px 18px;margin-top:12px;}
+    .md-row{display:flex;justify-content:space-between;padding:5px 0;font-size:.84rem;}
+    .md-row span:first-child{color:var(--faint);}
+    .md-row span:last-child{font-weight:700;color:var(--ink);}
+    .modal-btn{width:100%;margin-top:16px;padding:14px;background:var(--teal);color:#fff;border:none;border-radius:30px;font-family:'Cairo',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:.3s;text-decoration:none;display:block;}
+    .modal-btn:hover{background:var(--teal-dk);}
+    .modal-btn-ol{width:100%;margin-top:8px;padding:13px;background:transparent;color:var(--teal-dk);border:1.5px solid rgba(74,155,143,.3);border-radius:30px;font-family:'Cairo',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:.3s;}
+    .modal-btn-ol:hover{background:var(--teal-pale);}
+    .modal-btn-wa{width:100%;margin-top:8px;padding:13px;background:#25d366;color:#fff;border:none;border-radius:30px;font-family:'Cairo',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:.3s;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .modal-btn-wa:hover{background:#1ebe5d;}
+
+    /* SECTION DIVIDER */
+    .sec-divider{font-size:.82rem;font-weight:700;color:var(--teal-dk);padding:10px 0 6px;border-top:1px dashed rgba(74,155,143,.2);margin-top:6px;grid-column:1/-1;display:flex;align-items:center;gap:6px;}
+
+    /* IMAGE UPLOAD */
+    .img-upload-area{
+      border:2px dashed var(--sand);border-radius:var(--r-sm);
+      background:var(--warm);padding:28px 20px;text-align:center;
+      cursor:pointer;transition:.25s;position:relative;
+    }
+    .img-upload-area:hover,.img-upload-area.drag{border-color:var(--teal);background:var(--teal-pale);}
+    .img-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+    .img-upload-icon{font-size:2rem;margin-bottom:8px;}
+    .img-upload-area h5{font-size:.88rem;font-weight:700;color:var(--ink-mid);}
+    .img-upload-area p{font-size:.74rem;color:var(--faint);margin-top:4px;}
+    .img-previews{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;}
+    .img-prev-item{position:relative;width:88px;height:88px;border-radius:10px;overflow:hidden;border:2px solid var(--teal-soft);box-shadow:0 2px 8px rgba(74,155,143,.13);}
+    .img-prev-item img{width:100%;height:100%;object-fit:cover;}
+    .img-prev-del{position:absolute;top:3px;inset-inline-end:3px;width:20px;height:20px;border-radius:50%;background:rgba(208,80,80,.85);border:none;color:#fff;font-size:.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+    .img-count{font-size:.75rem;color:var(--muted);margin-top:6px;}
+    .upload-progress{display:none;margin-top:10px;}
+    .upload-progress.show{display:block;}
+    .progress-bar-wrap{background:var(--sand);border-radius:20px;height:6px;overflow:hidden;margin-top:6px;}
+    .progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--teal-lt),var(--teal));border-radius:20px;width:0%;transition:width .3s;}
+    .progress-label{font-size:.74rem;color:var(--muted);}
+
+    /* HIDDEN */
+    .hidden{display:none!important;}
+
+    @media(max-width:820px){
+      .page-body{grid-template-columns:1fr;}
+      .sidebar{position:static;}
+      nav,.hcta{display:none;}
+      .burger{display:flex;}
+      .steps-inner{gap:2px;}
+      .step-lbl{display:none;}
+      .step-item:not(:last-child)::after{margin:0 4px;}
+      .svc-opts{grid-template-columns:1fr 1fr;}
+      .delivery-opts{grid-template-columns:1fr 1fr;}
+      .page-body{padding:20px 4% 60px;}
+    }
+    @media(max-width:520px){
+      .form-grid{grid-template-columns:1fr;}
+      .svc-opts{grid-template-columns:1fr 1fr;}
+      .delivery-opts{grid-template-columns:1fr;}
+      .date-grid{grid-template-columns:1fr;}
+      .date-row{grid-template-columns:1fr;}
+      .ph{padding:32px 5%;}
+      .ph h1{font-size:1.5rem;}
+      .steps-bar{padding:14px 4%;}
+      .modal{padding:24px 18px;border-radius:18px;}
+      .modal h2{font-size:1.4rem;}
+      .modal-icon{width:68px;height:68px;font-size:2rem;}
+      .sum-card{padding:16px;}
+      .card .cb{padding:16px 16px;}
+      .card .ch{padding:14px 16px;}
+      .purchase-opts{gap:8px;}
+      .emp-opts{gap:8px;}
+    }
+    @media(max-width:380px){
+      .svc-opts{grid-template-columns:1fr;}
+      .purchase-opts{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a href="index.html" class="logo">
+    <div class="lm">✂️</div>
+    <span class="lt">ختر </span>
+  </a>
+  <nav>
+    <a href="index.html">الرئيسية</a>
+    <a href="doctors.html">فريق العمل</a>
+    <a href="booking.html" class="act">الحجز والشراء</a>
+    <a href="index.html#ft">تواصل</a>
+  </nav>
+  <a href="booking.html" class="hcta">اطلب الآن ←</a>
+  <div class="burger" onclick="toggleM()"><span></span><span></span><span></span></div>
+</header>
+<div class="mnav" id="mn">
+  <a href="index.html">🏠 الرئيسية</a>
+  <a href="doctors.html">👗 فريق العمل</a>
+  <a href="booking.html">🛍️ الحجز والشراء</a>
+  <a href="index.html#ft">📞 تواصل</a>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="ph">
+  <div class="ph-in">
+    <h1>🛍️ حجز وشراء ملابس</h1>
+    <p>أكمل النموذج أدناه لطلب قطعتك المميزة — خدمة سريعة واحترافية</p>
+  </div>
+</div>
+
+<!-- STEPS BAR -->
+<div class="steps-bar">
+  <div class="steps-inner">
+    <div class="step-item active" id="s1"><div class="step-circle">1</div><span class="step-lbl">الموظف المناوب</span></div>
+    <div class="step-item" id="s2"><div class="step-circle">2</div><span class="step-lbl">نوع الخدمة</span></div>
+    <div class="step-item" id="s3"><div class="step-circle">3</div><span class="step-lbl">تفاصيل المنتج</span></div>
+    <div class="step-item" id="s4"><div class="step-circle">4</div><span class="step-lbl">بيانات العميل</span></div>
+    <div class="step-item" id="s5"><div class="step-circle">5</div><span class="step-lbl">تأكيد</span></div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="page-body">
+  <div style="display:flex;flex-direction:column;gap:20px;">
+
+    <!-- 1. EMPLOYEE -->
+    <div class="card">
+      <div class="ch"><div class="ch-ic">👗</div><h3>الموظف المناوب</h3></div>
+      <div class="cb">
+        <div class="emp-opts">
+          <div class="emp-opt" onclick="pickEmp(this,'ساره')">
+            <div class="empa">👩</div>
+            <div class="empi"><h4>ساره</h4><span class="emp-badge">متاحة الآن</span></div>
+            <div class="emp-radio"></div>
+          </div>
+          <div class="emp-opt" onclick="pickEmp(this,'نور')">
+            <div class="empa">👩‍💼</div>
+            <div class="empi"><h4>نور</h4><span class="emp-badge">متاحة الآن</span></div>
+            <div class="emp-radio"></div>
+          </div>
+          <div class="emp-opt" onclick="pickEmp(this,'آيه')">
+            <div class="empa">👩‍🎨</div>
+            <div class="empi"><h4>آيه</h4><span class="emp-badge">متاحة الآن</span></div>
+            <div class="emp-radio"></div>
+          </div>
+          <div class="emp-opt" onclick="pickEmp(this,'ناديه')">
+            <div class="empa">👩</div>
+            <div class="empi"><h4>ناديه</h4><span class="emp-badge">متاحة الآن</span></div>
+            <div class="emp-radio"></div>
+          </div>
+          <div class="emp-opt" onclick="pickEmp(this,'ضحى')">
+            <div class="empa">👩‍💼</div>
+            <div class="empi"><h4>ضحى</h4><span class="emp-badge">متاحة الآن</span></div>
+            <div class="emp-radio"></div>
+          </div>
+          <div class="emp-opt" onclick="pickEmp(this,'غاده')">
+            <div class="empa">👩‍🎨</div>
+            <div class="empi"><h4>غاده</h4><span class="emp-badge">متاحة الآن</span></div>
+            <div class="emp-radio"></div>
+          </div>
+        </div>
+        <p class="err-msg" id="empErr">يرجى اختيار الموظف المناوب</p>
+      </div>
+    </div>
+
+    <!-- 2. CLIENT DATA -->
+    <div class="card">
+      <div class="ch"><div class="ch-ic">👤</div><h3>بيانات العميل</h3></div>
+      <div class="cb">
+        <div class="form-grid">
+          <div class="fgroup">
+            <label><span class="req">*</span> الاسم</label>
+            <input type="text" id="clientName" placeholder="اسم العميل" oninput="clearE(this)"/>
+            <p class="err-msg" id="clientNameErr">الاسم مطلوب</p>
+          </div>
+          <div class="fgroup">
+            <label><span class="req">*</span> رقم الهاتف</label>
+            <input type="tel" id="phone" placeholder="05X XXXX XXXX" oninput="clearE(this)"/>
+            <p class="err-msg" id="phoneErr">رقم الهاتف مطلوب</p>
+          </div>
+          <div class="fgroup fg-full">
+            <label>العنوان</label>
+            <input type="text" id="address" placeholder="عنوان العميل"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. SERVICE TYPE -->
+    <div class="card">
+      <div class="ch"><div class="ch-ic">✂️</div><h3>نوع الخدمة</h3></div>
+      <div class="cb">
+        <div class="svc-opts">
+          <div class="svc-opt sel" onclick="pickSvc(this,'شراء')">
+            <div class="svc-icon">🛍️</div>
+            <h5>شراء</h5>
+          </div>
+          <div class="svc-opt" onclick="pickSvc(this,'استئجار')">
+            <div class="svc-icon">🔄</div>
+            <h5>استئجار</h5>
+          </div>
+        </div>
+        <p class="err-msg" id="svcErr">يرجى اختيار نوع الخدمة</p>
+      </div>
+    </div>
+
+    <!-- 4. PURCHASE REQUEST (شراء only) -->
+    <div class="card" id="purchaseSection">
+      <div class="ch"><div class="ch-ic">🧕</div><h3>طلب شراء</h3></div>
+      <div class="cb">
+        <div class="purchase-opts">
+          <div class="pur-opt" onclick="togglePur(this,'عباية')">
+            <div class="pur-chk">✓</div>
+            <span>🖤 عباية</span>
+          </div>
+          <div class="pur-opt" onclick="togglePur(this,'فستان')">
+            <div class="pur-chk">✓</div>
+            <span>👗 فستان</span>
+          </div>
+          <div class="pur-opt" onclick="togglePur(this,'شيلة')">
+            <div class="pur-chk">✓</div>
+            <span>🧕 شيلة</span>
+          </div>
+          <div class="pur-opt" onclick="togglePur(this,'أكسسوار')">
+            <div class="pur-chk">✓</div>
+            <span>💎 أكسسوار</span>
+          </div>
+          <div class="pur-opt" onclick="togglePur(this,'بخور')">
+            <div class="pur-chk">✓</div>
+            <span>🕯️ بخور</span>
+          </div>
+        </div>
+        <p class="err-msg" id="purErr" style="margin-top:8px;">يرجى اختيار نوع الطلب</p>
+      </div>
+    </div>
+
+    <!-- 5. PRODUCT DETAILS -->
+    <div class="card">
+      <div class="ch"><div class="ch-ic">🏷️</div><h3>تفاصيل المنتج</h3></div>
+      <div class="cb">
+        <div class="form-grid">
+          <div class="fgroup">
+            <label><span class="req">*</span> اسم المنتج</label>
+            <input type="text" id="productName" placeholder="مثال: عباية الكاب الملكي" oninput="clearE(this); updateProdSummary()"/>
+            <p class="err-msg" id="productNameErr">اسم المنتج مطلوب</p>
+          </div>
+          <div class="fgroup">
+            <label><span class="req">*</span> كود المنتج</label>
+            <input type="text" id="productCode" placeholder="مثال: AB-2024-001" oninput="clearE(this); updateProdSummary()"/>
+            <p class="err-msg" id="productCodeErr">كود المنتج مطلوب</p>
+          </div>
+
+          <!-- MEASUREMENTS — shown only for شراء -->
+          <div class="meas-title" id="measTitle">المقاسات</div>
+
+          <div class="fgroup" id="mHeight">
+            <label>الطول</label>
+            <input type="number" id="height" placeholder="الطول" min="100" max="220"/>
+          </div>
+          <div class="fgroup" id="mChest">
+            <label>الصدر</label>
+            <input type="number" id="chest" placeholder="محيط الصدر" min="50" max="200"/>
+          </div>
+          <div class="fgroup" id="mWaist">
+            <label>الخصر</label>
+            <input type="number" id="waist" placeholder="محيط الخصر" min="40" max="200"/>
+          </div>
+          <div class="fgroup" id="mShoulder">
+            <label>الكتف</label>
+            <input type="number" id="shoulder" placeholder="عرض الكتف" min="20" max="80"/>
+          </div>
+          <div class="fgroup" id="mSleeve">
+            <label>طول الكم</label>
+            <input type="number" id="sleeve" placeholder="طول الكم" min="30" max="100"/>
+          </div>
+
+          <!-- IMAGE UPLOAD -->
+          <div class="sec-divider" style="grid-column:1/-1;">📸 صور المنتج</div>
+          <div class="fg-full">
+            <label>صور المنتج <span style="color:var(--faint);font-weight:400;">(اختياري — يمكن رفع أكثر من صورة)</span></label>
+            <div class="img-upload-area" id="imgDropZone" onclick="document.getElementById('productImages').click()">
+              <input type="file" id="productImages" accept="image/*" multiple onchange="handleImgSelect(event)" onclick="event.stopPropagation()"/>
+              <div class="img-upload-icon">🖼️</div>
+              <h5>اضغط لاختيار الصور أو اسحبها هنا</h5>
+              <p>JPG، PNG، WEBP — بحد أقصى 5 صور، 5 MB لكل صورة</p>
+            </div>
+            <div class="img-previews" id="imgPreviews"></div>
+            <div class="img-count" id="imgCount"></div>
+            <div class="upload-progress" id="uploadProgress">
+              <p class="progress-label" id="progressLabel">جارٍ رفع الصور...</p>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill"></div></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. RENT DATES — shown only for استئجار -->
+    <div class="card hidden" id="rentSection">
+      <div class="ch"><div class="ch-ic">📅</div><h3>تفاصيل الاستئجار</h3></div>
+      <div class="cb">
+        <div class="date-grid">
+          <div class="date-group">
+            <label><span class="req">*</span> تاريخ الاستئجار</label>
+            <div class="date-row">
+              <input type="date" id="rentDate" oninput="clearE(this)"/>
+              <input type="time" id="rentTime" oninput="clearE(this)"/>
+            </div>
+            <p class="err-msg" id="rentDateErr">تاريخ الاستئجار مطلوب</p>
+          </div>
+          <div class="date-group">
+            <label><span class="req">*</span> تاريخ الإرجاع</label>
+            <div class="date-row">
+              <input type="date" id="returnDate" oninput="clearE(this)"/>
+              <input type="time" id="returnTime" oninput="clearE(this)"/>
+            </div>
+            <p class="err-msg" id="returnDateErr">تاريخ الإرجاع مطلوب</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. DELIVERY — shown only for شراء -->
+    <div class="card" id="deliverySection">
+      <div class="ch"><div class="ch-ic">🚚</div><h3>طريقة الاستلام</h3></div>
+      <div class="cb">
+        <div class="delivery-opts">
+          <div class="dlv-opt sel" onclick="pickDelivery(this,'استلام من المتجر')" id="dlvStore">
+            <div class="dlv-ico">🏪</div>
+            <div class="dlv-info">
+              <h5>استلام من المتجر</h5>
+              <p>استلم طلبك مباشرة</p>
+            </div>
+            <div class="dlv-radio"></div>
+          </div>
+          <div class="dlv-opt" onclick="pickDelivery(this,'إرسال الطلب')" id="dlvShip">
+            <div class="dlv-ico">📦</div>
+            <div class="dlv-info">
+              <h5>إرسال الطلب</h5>
+              <p>نوصله لعنوانك</p>
+            </div>
+            <div class="dlv-radio"></div>
+          </div>
+        </div>
+        <p class="err-msg" id="dlvErr">يرجى اختيار طريقة الاستلام</p>
+      </div>
+    </div>
+
+    <!-- 7b. PRICE & PAYMENT -->
+    <div class="card" id="priceSection">
+      <div class="ch"><div class="ch-ic">💰</div><h3>السعر والدفع</h3></div>
+      <div class="cb">
+        <div class="form-grid">
+          <div class="fgroup">
+            <label><span class="req">*</span> السعر الإجمالي (ر.ع)</label>
+            <input type="number" id="totalPrice" min="0" step="any" placeholder="مثال: 1500" oninput="recalcRemain()"/>
+            <p class="err-msg" id="totalPriceErr">السعر الإجمالي مطلوب</p>
+          </div>
+          <div class="fgroup">
+            <label>المبلغ المدفوع (ر.ع)</label>
+            <input type="number" id="paidAmount" min="0" step="any" value="0" placeholder="0" oninput="recalcRemain()"/>
+          </div>
+          <div class="fgroup fg-full">
+            <label>المتبقي (ر.ع)</label>
+            <input type="number" id="remainAmount" value="0" readonly style="background:var(--teal-pale);color:var(--teal-dk);font-weight:700;"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. NOTES -->
+    <div class="card">
+      <div class="ch"><div class="ch-ic">📝</div><h3>ملاحظات أخرى</h3></div>
+      <div class="cb">
+        <textarea id="notes" placeholder="أي ملاحظات أو تفاصيل إضافية..."></textarea>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sum-card">
+      <h3>📋 ملخص الطلب</h3>
+      <div class="sum-row"><div class="sum-ico">👩</div><div><div class="sum-lbl">الموظف المناوب</div><div class="sum-val pend" id="sEmp">لم يتم الاختيار</div></div></div>
+      <div class="sum-row"><div class="sum-ico">✂️</div><div><div class="sum-lbl">نوع الخدمة</div><div class="sum-val pend" id="sSvc">لم يتم الاختيار</div></div></div>
+      <div class="sum-row"><div class="sum-ico">👤</div><div><div class="sum-lbl">اسم العميل</div><div class="sum-val pend" id="sClient">لم يتم الإدخال</div></div></div>
+      <div class="sum-row"><div class="sum-ico">🏷️</div><div><div class="sum-lbl">اسم المنتج</div><div class="sum-val pend" id="sProdName">لم يتم الإدخال</div></div></div>
+      <div class="sum-row"><div class="sum-ico">🔢</div><div><div class="sum-lbl">كود المنتج</div><div class="sum-val pend" id="sProdCode">—</div></div></div>
+      <div class="price-box">
+        <div class="pr"><span>السعر الإجمالي</span><span id="sTotal">0 ر.ع</span></div>
+        <div class="pr"><span>المدفوع</span><span id="sPaid">0 ر.ع</span></div>
+        <div class="pr tot"><span>المتبقي</span><span id="sRemain">0 ر.ع</span></div>
+      </div>
+      <button class="submit-btn" onclick="submitBooking()">✓ تأكيد الطلب</button>
+      <div class="trust-list">
+        <div class="ti"><span class="ti-ic">🔒</span> بياناتك آمنة ومشفرة</div>
+        <div class="ti"><span class="ti-ic">✅</span> تأكيد فوري</div>
+        <div class="ti"><span class="ti-ic">🚚</span> توصيل لجميع المناطق</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-ov" id="modal">
+  <div class="modal">
+    <div class="modal-icon">🎉</div>
+    <h2>تم الطلب بنجاح!</h2>
+    <p>تم استلام طلبك، سيتواصل معك الموظف المناوب خلال دقائق لتأكيد التفاصيل.</p>
+    <div class="booking-num">
+      رقم الطلب:<br>
+      <strong id="bookId"></strong>
+    </div>
+    <div class="modal-details" id="mDetails"></div>
+
+
+    <button class="modal-btn" onclick="closeModal()">تقديم طلب جديد</button>
+    <button class="modal-btn-wa" onclick="sendWhatsApp()">📲 إرسال تأكيد واتساب للعميل</button>
+  </div>
+</div>
+
+<script>
+  // ─ State ─
+  let state = {
+    emp: null,
+    svc: 'شراء',
+    delivery: 'استلام من المتجر',
+    purItems: new Set()
+  };
+  let lastOrder = {};
+
+  // ─ Image Upload ─
+  let selectedFiles = [];
+
+  function handleImgSelect(e) {
+    const newFiles = Array.from(e.target.files);
+    addFiles(newFiles);
+    // reset input so same file can be re-selected
+    e.target.value = '';
+  }
+
+  function addFiles(newFiles) {
+    const allowed = newFiles.filter(f => f.type.startsWith('image/') && f.size <= 5 * 1024 * 1024);
+    const rejected = newFiles.length - allowed.length;
+    if (rejected > 0) alert(`تم تجاهل ${rejected} ملف — تأكد أن الحجم لا يتجاوز 5MB وأن الملف صورة.`);
+    const combined = [...selectedFiles, ...allowed];
+    selectedFiles = combined.slice(0, 5); // max 5
+    if (combined.length > 5) alert('الحد الأقصى 5 صور — تم الاحتفاظ بأول 5 صور فقط.');
+    renderPreviews();
+  }
+
+  function renderPreviews() {
+    const container = document.getElementById('imgPreviews');
+    const countEl = document.getElementById('imgCount');
+    container.innerHTML = '';
+    selectedFiles.forEach((file, i) => {
+      const url = URL.createObjectURL(file);
+      const item = document.createElement('div');
+      item.className = 'img-prev-item';
+      item.innerHTML = `<img src="${url}" alt="صورة ${i+1}"/><button class="img-prev-del" title="حذف" onclick="removeImg(${i})">✕</button>`;
+      container.appendChild(item);
+    });
+    countEl.textContent = selectedFiles.length > 0 ? `${selectedFiles.length} صورة مختارة` : '';
+  }
+
+  function removeImg(index) {
+    selectedFiles.splice(index, 1);
+    renderPreviews();
+  }
+
+  // Drag & Drop
+  const dropZone = document.getElementById('imgDropZone');
+  if (dropZone) {
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('drag');
+      addFiles(Array.from(e.dataTransfer.files));
+    });
+  }
+
+  async function uploadImages(orderId) {
+    if (selectedFiles.length === 0) return [];
+    const progressEl = document.getElementById('uploadProgress');
+    const progressFill = document.getElementById('progressFill');
+    const progressLabel = document.getElementById('progressLabel');
+    progressEl.classList.add('show');
+    const urls = [];
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i];
+      progressLabel.textContent = `جارٍ رفع الصورة ${i + 1} من ${selectedFiles.length}...`;
+      progressFill.style.width = `${Math.round((i / selectedFiles.length) * 100)}%`;
+      const ext = file.name.split('.').pop();
+      const path = `orders/${orderId}/img_${i + 1}_${Date.now()}.${ext}`;
+      const storageRef = window._storageRef(window._storage, path);
+      await window._uploadBytes(storageRef, file);
+      const url = await window._getDownloadURL(storageRef);
+      urls.push(url);
+    }
+    progressFill.style.width = '100%';
+    progressLabel.textContent = `✅ تم رفع ${selectedFiles.length} صورة بنجاح`;
+    return urls;
+  }
+
+  // ─ Employee ─
+  function pickEmp(el, name) {
+    document.querySelectorAll('.emp-opt').forEach(d => d.classList.remove('sel'));
+    el.classList.add('sel');
+    state.emp = name;
+    const sEmp = document.getElementById('sEmp');
+    sEmp.textContent = name;
+    sEmp.classList.remove('pend');
+    updateStep(1);
+    document.getElementById('empErr').classList.remove('show');
+  }
+
+  // ─ Service Type ─
+  function pickSvc(el, type) {
+    document.querySelectorAll('.svc-opt').forEach(s => s.classList.remove('sel'));
+    el.classList.add('sel');
+    state.svc = type;
+    const sSvc = document.getElementById('sSvc');
+    sSvc.textContent = type;
+    sSvc.classList.remove('pend');
+    updateStep(2);
+
+    const isRent = (type === 'استئجار');
+
+    // Show/hide rent dates
+    document.getElementById('rentSection').classList.toggle('hidden', !isRent);
+
+    // Show/hide purchase request
+    document.getElementById('purchaseSection').classList.toggle('hidden', isRent);
+
+    // Show/hide measurements
+    document.getElementById('measTitle').classList.toggle('hidden', isRent);
+    ['mHeight','mChest','mWaist','mShoulder','mSleeve'].forEach(id => {
+      document.getElementById(id).classList.toggle('hidden', isRent);
+    });
+
+    // Show/hide delivery
+    document.getElementById('deliverySection').classList.toggle('hidden', isRent);
+  }
+
+  // ─ Purchase multi-select ─
+  function togglePur(el, item) {
+    el.classList.toggle('sel');
+    if (state.purItems.has(item)) {
+      state.purItems.delete(item);
+    } else {
+      state.purItems.add(item);
+    }
+    document.getElementById('purErr').classList.remove('show');
+  }
+
+  // ─ Delivery ─
+  function pickDelivery(el, type) {
+    document.querySelectorAll('.dlv-opt').forEach(d => d.classList.remove('sel'));
+    el.classList.add('sel');
+    state.delivery = type;
+    document.getElementById('dlvErr').classList.remove('show');
+  }
+
+  // ─ Product Summary ─
+  function updateProdSummary() {
+    const pn = document.getElementById('productName').value.trim();
+    const pc = document.getElementById('productCode').value.trim();
+    const pnEl = document.getElementById('sProdName');
+    const pcEl = document.getElementById('sProdCode');
+    if (pn) { pnEl.textContent = pn; pnEl.classList.remove('pend'); }
+    else { pnEl.textContent = 'لم يتم الإدخال'; pnEl.classList.add('pend'); }
+    if (pc) { pcEl.textContent = pc; pcEl.classList.remove('pend'); }
+    else { pcEl.textContent = '—'; pcEl.classList.add('pend'); }
+    if (pn && pc) updateStep(3);
+
+    // Client summary live
+    const cn = document.getElementById('clientName').value.trim();
+    const cnEl = document.getElementById('sClient');
+    if (cn) { cnEl.textContent = cn; cnEl.classList.remove('pend'); }
+    else { cnEl.textContent = 'لم يتم الإدخال'; cnEl.classList.add('pend'); }
+  }
+
+  // Live client name update
+  document.getElementById('clientName').addEventListener('input', function() {
+    const cnEl = document.getElementById('sClient');
+    if (this.value.trim()) { cnEl.textContent = this.value.trim(); cnEl.classList.remove('pend'); }
+    else { cnEl.textContent = 'لم يتم الإدخال'; cnEl.classList.add('pend'); }
+  });
+
+
+
+  // ─ Price / Paid / Remaining ─
+  function recalcRemain() {
+    const t = parseFloat(document.getElementById('totalPrice').value) || 0;
+    let p = parseFloat(document.getElementById('paidAmount').value) || 0;
+    if (p > t) p = t;
+    const r = Math.max(0, t - p);
+    document.getElementById('remainAmount').value = r;
+    document.getElementById('sTotal').textContent  = t.toLocaleString('ar-EG') + ' ر.ع';
+    document.getElementById('sPaid').textContent   = p.toLocaleString('ar-EG') + ' ر.ع';
+    document.getElementById('sRemain').textContent = r.toLocaleString('ar-EG') + ' ر.ع';
+  }
+
+  // ─ Steps ─
+  function updateStep(n) {
+    if (n === 1 && state.emp) { document.getElementById('s1').classList.add('done'); document.getElementById('s2').classList.add('active'); }
+    if (n === 2) { document.getElementById('s2').classList.add('done'); document.getElementById('s3').classList.add('active'); }
+    if (n === 3) { document.getElementById('s3').classList.add('done'); document.getElementById('s4').classList.add('active'); }
+  }
+
+  // ─ Validation ─
+  function validateForm() {
+    let ok = true;
+    const isRent = (state.svc === 'استئجار');
+
+    if (!state.emp) { document.getElementById('empErr').classList.add('show'); ok = false; }
+
+    // Client name & phone
+    ['clientName','phone'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) { el.classList.add('err'); document.getElementById(id + 'Err').classList.add('show'); ok = false; }
+    });
+
+    // Product fields
+    ['productName','productCode'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) { el.classList.add('err'); document.getElementById(id + 'Err').classList.add('show'); ok = false; }
+    });
+
+    // Price
+    const tp = document.getElementById('totalPrice');
+    if (!tp.value || parseFloat(tp.value) <= 0) { tp.classList.add('err'); document.getElementById('totalPriceErr').classList.add('show'); ok = false; }
+
+    if (!isRent) {
+      // Purchase items
+      if (state.purItems.size === 0) { document.getElementById('purErr').classList.add('show'); ok = false; }
+    } else {
+      // Rent dates
+      const rd = document.getElementById('rentDate');
+      const ret = document.getElementById('returnDate');
+      if (!rd.value) { rd.classList.add('err'); document.getElementById('rentDateErr').classList.add('show'); ok = false; }
+      if (!ret.value) { ret.classList.add('err'); document.getElementById('returnDateErr').classList.add('show'); ok = false; }
+    }
+
+    return ok;
+  }
+
+  function clearE(el) { el.classList.remove('err'); document.querySelectorAll('.err-msg.show').forEach(e => e.classList.remove('show')); }
+
+  // ─ Submit ─
+  async function submitBooking() {
+    if (!validateForm()) return;
+
+    // Disable button during upload
+    const btn = document.querySelector('.submit-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ جارٍ إرسال الطلب...';
+
+    document.getElementById('s4').classList.add('done');
+    document.getElementById('s5').classList.add('active', 'done');
+    const id = 'KT-' + Math.floor(Math.random() * 90000 + 10000);
+    document.getElementById('bookId').textContent = id;
+    const isRent = (state.svc === 'استئجار');
+    const cn = document.getElementById('clientName').value;
+    const ph = document.getElementById('phone').value;
+    const pname = document.getElementById('productName').value;
+    const pcode = document.getElementById('productCode').value;
+
+    // ── رفع الصور أولاً ──
+    let imageUrls = [];
+    try {
+      const deadline = Date.now() + 8000;
+      while (!window._storage && Date.now() < deadline) {
+        await new Promise(r => setTimeout(r, 150));
+      }
+      imageUrls = await uploadImages(id);
+    } catch (err) {
+      console.error('خطأ في رفع الصور:', err);
+    }
+
+    let details = `
+      <div class="md-row"><span>الموظف</span><span>${state.emp}</span></div>
+      <div class="md-row"><span>العميل</span><span>${cn}</span></div>
+      <div class="md-row"><span>الهاتف</span><span>${ph}</span></div>
+      <div class="md-row"><span>الخدمة</span><span>${state.svc}</span></div>
+      <div class="md-row"><span>المنتج</span><span>${pname}</span></div>
+      <div class="md-row"><span>الكود</span><span>${pcode}</span></div>`;
+
+    if (!isRent) {
+      details += `<div class="md-row"><span>طلب شراء</span><span>${[...state.purItems].join(' - ')}</span></div>`;
+      details += `<div class="md-row"><span>الاستلام</span><span>${state.delivery}</span></div>`;
+      const h = document.getElementById('height').value;
+      const ch = document.getElementById('chest').value;
+      const w = document.getElementById('waist').value;
+      const sh = document.getElementById('shoulder').value;
+      const sl = document.getElementById('sleeve').value;
+      if (h) details += `<div class="md-row"><span>الطول</span><span>${h}</span></div>`;
+      if (ch) details += `<div class="md-row"><span>الصدر</span><span>${ch}</span></div>`;
+      if (w) details += `<div class="md-row"><span>الخصر</span><span>${w}</span></div>`;
+      if (sh) details += `<div class="md-row"><span>الكتف</span><span>${sh}</span></div>`;
+      if (sl) details += `<div class="md-row"><span>طول الكم</span><span>${sl}</span></div>`;
+    } else {
+      const rd = document.getElementById('rentDate').value;
+      const rt = document.getElementById('rentTime').value;
+      const ret = document.getElementById('returnDate').value;
+      const rett = document.getElementById('returnTime').value;
+      details += `<div class="md-row"><span>تاريخ الاستئجار</span><span>${rd} ${rt}</span></div>`;
+      details += `<div class="md-row"><span>تاريخ الإرجاع</span><span>${ret} ${rett}</span></div>`;
+    }
+
+    const notes = document.getElementById('notes').value;
+    const _t = parseFloat(document.getElementById('totalPrice').value) || 0;
+    let _p = parseFloat(document.getElementById('paidAmount').value) || 0;
+    if (_p > _t) _p = _t;
+    const _r = Math.max(0, _t - _p);
+    details += `<div class="md-row"><span>السعر الإجمالي</span><span>${_t.toLocaleString('ar-EG')} ر.ع</span></div>`;
+    details += `<div class="md-row"><span>المدفوع</span><span>${_p.toLocaleString('ar-EG')} ر.ع</span></div>`;
+    details += `<div class="md-row"><span>المتبقي</span><span>${_r.toLocaleString('ar-EG')} ر.ع</span></div>`;
+    if (notes) details += `<div class="md-row"><span>ملاحظات</span><span>${notes}</span></div>`;
+    if (imageUrls.length > 0) details += `<div class="md-row"><span>الصور</span><span>${imageUrls.length} صورة مرفوعة ✅</span></div>`;
+
+    document.getElementById('mDetails').innerHTML = details;
+    document.getElementById('modal').classList.add('open');
+    btn.disabled = false;
+    btn.textContent = '✓ تأكيد الطلب';
+
+    // حفظ بيانات الطلب لزر واتساب
+    lastOrder = {
+      id, cn, ph, pname, pcode, svc: state.svc,
+      isRent: (state.svc === 'استئجار'),
+      emp: state.emp,
+      delivery: state.svc !== 'استئجار' ? state.delivery : '',
+      rentDate:   state.svc === 'استئجار' ? (document.getElementById('rentDate')?.value   || '') : '',
+      rentTime:   state.svc === 'استئجار' ? (document.getElementById('rentTime')?.value   || '') : '',
+      returnDate: state.svc === 'استئجار' ? (document.getElementById('returnDate')?.value || '') : '',
+      returnTime: state.svc === 'استئجار' ? (document.getElementById('returnTime')?.value || '') : '',
+      notes: document.getElementById('notes')?.value || '',
+      price: _t, paid: _p, remaining: _r
+    };
+
+
+    // ── حفظ الطلب في Firestore ──
+    (async () => {
+      // انتظر Firebase يكون جاهز
+      const deadline = Date.now() + 8000;
+      while ((!window._db || !window._addDoc) && Date.now() < deadline) {
+        await new Promise(r => setTimeout(r, 150));
+      }
+      if (!window._db || !window._addDoc) {
+        console.error('Firebase غير متاح');
+        return;
+      }
+
+      // احفظ الطلب كاملاً
+      const isRentSave = (state.svc === 'استئجار');
+      const orderData = {
+        id,
+        client: cn,
+        phone: ph,
+        employee: state.emp,
+        service: state.svc,
+        product: pname,
+        code: pcode,
+        status: 'قيد الانتظار',
+        notes: document.getElementById('notes')?.value || '',
+        images: imageUrls,
+        date: new Date().toISOString().split('T')[0],
+        price: _t,
+        paid: _p,
+        remaining: _r,
+        createdAt: window._serverTimestamp()
+      };
+      if (!isRentSave) {
+        orderData.purchaseItems = [...state.purItems];
+        orderData.delivery = state.delivery;
+        orderData.measurements = {
+          height:   document.getElementById('height')?.value   || '',
+          chest:    document.getElementById('chest')?.value    || '',
+          waist:    document.getElementById('waist')?.value    || '',
+          shoulder: document.getElementById('shoulder')?.value || '',
+          sleeve:   document.getElementById('sleeve')?.value   || ''
+        };
+      } else {
+        orderData.rentDate   = document.getElementById('rentDate')?.value   || '';
+        orderData.rentTime   = document.getElementById('rentTime')?.value   || '';
+        orderData.returnDate = document.getElementById('returnDate')?.value || '';
+        orderData.returnTime = document.getElementById('returnTime')?.value || '';
+      }
+
+      try {
+        await window._addDoc(window._collection(window._db, 'orders'), orderData);
+        console.log('✅ تم حفظ الطلب في Firestore');
+      } catch (err) {
+        console.error('❌ خطأ في حفظ الطلب:', err);
+      }
+    })();
+  }
+
+  function sendWhatsApp() {
+    const o = lastOrder;
+    if (!o.ph) return;
+
+    // تصحيح رقم الهاتف - عُماني
+    let phone = o.ph.replace(/\D/g, '');
+    // لو بيبدأ بـ 0 → اشيله وضيف 968
+    if (phone.startsWith('0')) phone = '968' + phone.slice(1);
+    // لو 8 أرقام بدون كود دولة (الأرقام العُمانية 8 أرقام) → ضيف 968
+    if (!phone.startsWith('968') && phone.length === 8) phone = '968' + phone;
+
+    let msg = `مرحباً ${o.cn} 👋\n\nنؤكد لك استلام طلبك بنجاح ✅\n\n`;
+    msg += `🔖 رقم الطلب: ${o.id}\n`;
+    msg += `👔 المنتج: ${o.pname}\n`;
+    msg += `🏷️ الكود: ${o.pcode}\n`;
+    msg += `📋 الخدمة: ${o.svc}\n`;
+    if (o.isRent) {
+      if (o.rentDate)   msg += `📅 تاريخ الاستئجار: ${o.rentDate}${o.rentTime ? ' ' + o.rentTime : ''}\n`;
+      if (o.returnDate) msg += `📅 تاريخ الإرجاع: ${o.returnDate}${o.returnTime ? ' ' + o.returnTime : ''}\n`;
+    } else {
+      if (o.delivery) msg += `🚚 طريقة الاستلام: ${o.delivery}\n`;
+    }
+    msg += `💰 السعر الإجمالي: ${(o.price||0).toLocaleString('ar-EG')} ر.ع\n`;
+    msg += `✅ المدفوع: ${(o.paid||0).toLocaleString('ar-EG')} ر.ع\n`;
+    msg += `⏳ المتبقي: ${(o.remaining||0).toLocaleString('ar-EG')} ر.ع\n`;
+    if (o.notes) msg += `📝 ملاحظات: ${o.notes}\n`;
+    msg += `\nشكراً لثقتك بنا 🙏`;
+
+    // استخدام api.whatsapp.com بدل wa.me لأنه أكثر استقراراً
+    const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    location.reload();
+  }
+
+  function toggleM() { document.getElementById('mn').classList.toggle('open'); }
+</script>
+</body>
+</html>

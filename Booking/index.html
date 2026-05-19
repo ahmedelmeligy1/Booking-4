@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>اختر  | عبايات وملابس فاخرة</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --teal:#4a9b8f;--teal-lt:#6fb8ad;--teal-dk:#2e7a6e;
+      --teal-pale:#e4f4f1;--teal-soft:#c8e9e4;
+      --cream:#faf9f6;--warm:#f4f1ec;--sand:#e8e0d4;--sand-lt:#c0b4a4;
+      --ink:#1e2d2a;--ink-mid:#3d5450;--muted:#647872;--faint:#9db4af;
+      --sh:0 2px 20px rgba(46,122,110,.09);--sh-lg:0 8px 40px rgba(46,122,110,.14);
+      --r:18px;--r-sm:12px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Cairo',sans-serif;background:var(--cream);color:var(--ink);overflow-x:hidden;}
+    ::-webkit-scrollbar{width:5px;}
+    ::-webkit-scrollbar-thumb{background:var(--teal-lt);border-radius:3px;}
+
+    /* HEADER */
+    header{position:fixed;top:0;width:100%;z-index:999;background:rgba(250,249,246,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(74,155,143,.13);height:72px;display:flex;align-items:center;padding:0 6%;justify-content:space-between;transition:box-shadow .3s;}
+    header.scrolled{box-shadow:var(--sh);}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .logo-mark{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--teal-dk),var(--teal-lt));display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 4px 12px rgba(74,155,143,.32);}
+    .logo-text{font-family:'Tajawal',sans-serif;font-size:1.55rem;font-weight:900;color:var(--teal-dk);}
+    nav{display:flex;align-items:center;gap:4px;}
+    nav a{text-decoration:none;color:var(--muted);font-size:.9rem;font-weight:500;padding:8px 16px;border-radius:30px;transition:.25s;}
+    nav a:hover,nav a.act{color:var(--teal-dk);background:var(--teal-pale);}
+    nav a.act{font-weight:700;}
+    .h-cta{background:var(--teal);color:#fff;padding:10px 24px;border-radius:30px;font-weight:700;font-size:.9rem;text-decoration:none;box-shadow:0 4px 14px rgba(74,155,143,.35);transition:.3s;}
+    .h-cta:hover{background:var(--teal-dk);}
+    .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;}
+    .burger span{display:block;width:24px;height:2px;background:var(--ink-mid);border-radius:2px;}
+    .mnav{display:none;position:fixed;top:72px;right:0;left:0;background:var(--cream);border-bottom:1px solid var(--sand);padding:12px 6%;flex-direction:column;gap:4px;z-index:998;box-shadow:0 8px 24px rgba(0,0,0,.07);}
+    .mnav.open{display:flex;}
+    .mnav a{text-decoration:none;color:var(--muted);font-size:.95rem;padding:11px 14px;border-radius:var(--r-sm);transition:.2s;}
+    .mnav a:hover{background:var(--teal-pale);color:var(--teal-dk);}
+
+    /* HERO */
+    .hero{min-height:92vh;display:flex;align-items:center;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--teal-dk) 0%,#3a8f84 45%,var(--teal-lt) 100%);}
+    .hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='40' cy='40' r='30' fill='none' stroke='%23fff' stroke-width='.6' stroke-opacity='.07'/%3E%3C/svg%3E") repeat,radial-gradient(ellipse 70% 60% at 80% 50%,rgba(255,255,255,.06),transparent 70%);}
+    .hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:100px;background:linear-gradient(to top,var(--cream),transparent);pointer-events:none;}
+    .hblob{position:absolute;border-radius:50%;pointer-events:none;}
+    .hb1{width:500px;height:500px;top:-120px;right:-80px;background:radial-gradient(circle,rgba(255,255,255,.08),transparent 65%);}
+    .hb2{width:350px;height:350px;bottom:-60px;left:-60px;background:radial-gradient(circle,rgba(255,255,255,.06),transparent 65%);}
+    .h-inner{max-width:1240px;margin:0 auto;width:100%;padding:120px 6% 100px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:1;}
+
+    .hero-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.28);color:#fff;padding:6px 18px;border-radius:30px;font-size:.78rem;font-weight:700;margin-bottom:22px;backdrop-filter:blur(6px);animation:fadeUp .7s ease both;}
+    .pdot{width:7px;height:7px;background:#7fffd4;border-radius:50%;animation:blink 2s infinite;box-shadow:0 0 6px rgba(127,255,212,.6);}
+    @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+    .hero h1{font-family:'Tajawal',sans-serif;font-size:clamp(2rem,4.5vw,3.6rem);font-weight:900;line-height:1.22;color:#fff;text-shadow:0 2px 20px rgba(0,0,0,.15);animation:fadeUp .8s .08s ease both;}
+    .hero h1 em{font-style:normal;color:#b2f0e8;position:relative;display:inline-block;}
+    .hero h1 em::after{content:'';position:absolute;bottom:-5px;right:0;left:0;height:3px;background:linear-gradient(90deg,#7fffd4,transparent);border-radius:2px;}
+    .hero-p{margin-top:20px;font-size:1.04rem;line-height:1.85;color:rgba(255,255,255,.82);max-width:460px;animation:fadeUp .8s .16s ease both;}
+    .hero-btns{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap;animation:fadeUp .8s .24s ease both;}
+    .btn-p{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--teal-dk);padding:15px 32px;border-radius:30px;font-family:'Cairo',sans-serif;font-size:1rem;font-weight:700;text-decoration:none;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.18);transition:.3s;}
+    .btn-p:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.22);}
+    .btn-g{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);color:#fff;padding:15px 28px;border-radius:30px;border:1.5px solid rgba(255,255,255,.4);font-family:'Cairo',sans-serif;font-size:1rem;font-weight:600;text-decoration:none;cursor:pointer;transition:.3s;backdrop-filter:blur(6px);}
+    .btn-g:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.7);}
+    .trust-row{display:flex;margin-top:48px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:16px;overflow:hidden;backdrop-filter:blur(8px);width:fit-content;animation:fadeUp .8s .32s ease both;}
+    .trust-it{padding:16px 28px;text-align:center;}
+    .trust-n{font-family:'Tajawal',sans-serif;font-size:1.6rem;font-weight:900;color:#fff;}
+    .trust-l{font-size:.72rem;color:rgba(255,255,255,.7);margin-top:2px;}
+    .trust-sep{width:1px;background:rgba(255,255,255,.18);}
+
+    .hv{display:flex;flex-direction:column;gap:14px;animation:fadeLeft .9s .12s ease both;}
+    .hvc{background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-radius:var(--r);padding:18px 20px;box-shadow:0 8px 32px rgba(0,0,0,.14);border:1px solid rgba(255,255,255,.6);transition:transform .3s;}
+    .hvc:hover{transform:translateY(-3px);}
+    .hv-emp{display:flex;align-items:center;gap:14px;}
+    .hv-av{width:54px;height:54px;border-radius:14px;flex-shrink:0;background:var(--teal-soft);display:flex;align-items:center;justify-content:center;font-size:1.6rem;}
+    .hv-di h4{font-size:.95rem;font-weight:700;color:var(--ink);}
+    .hv-di p{font-size:.78rem;color:var(--muted);margin-top:2px;}
+    .hv-badge{display:inline-block;margin-top:6px;background:rgba(74,155,143,.14);color:var(--teal-dk);padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;}
+    .hv-stitle{font-size:.76rem;font-weight:700;color:var(--muted);margin-bottom:10px;}
+    .hv-steps{display:flex;flex-direction:column;gap:7px;}
+    .hv-step{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r-sm);background:var(--warm);}
+    .hv-sn{width:24px;height:24px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;}
+    .hv-step span{font-size:.82rem;font-weight:600;color:var(--ink-mid);}
+    .hv-row{display:flex;gap:10px;align-items:center;}
+    .hv-ic{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;background:rgba(74,155,143,.12);}
+    .hv-ri{flex:1;}
+    .hv-ri h5{font-size:.85rem;font-weight:700;color:var(--ink);}
+    .hv-ri p{font-size:.74rem;color:var(--muted);}
+    .hv-rbtn{background:var(--teal);color:#fff;border:none;padding:7px 14px;border-radius:20px;font-family:'Cairo',sans-serif;font-size:.76rem;font-weight:700;cursor:pointer;transition:.2s;}
+    .hv-rbtn:hover{background:var(--teal-dk);}
+
+    /* SECTIONS */
+    .sec{padding:90px 6%;}
+    .si{max-width:1240px;margin:0 auto;}
+    .stag{display:inline-block;background:var(--teal-pale);color:var(--teal-dk);padding:5px 16px;border-radius:20px;font-size:.76rem;font-weight:700;margin-bottom:14px;}
+    .stitle{font-family:'Tajawal',sans-serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;color:var(--ink);}
+    .ssub{color:var(--muted);font-size:.97rem;margin-top:12px;line-height:1.8;}
+    .scenter{text-align:center;}
+    .cen{max-width:520px;margin-inline:auto;}
+
+    /* SERVICES */
+    .svc-sec{background:var(--warm);}
+    .svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;margin-top:52px;}
+    .svc-card{background:#fff;border-radius:var(--r);padding:32px 26px;border:1px solid rgba(74,155,143,.10);box-shadow:var(--sh);transition:.35s;position:relative;overflow:hidden;}
+    .svc-card::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:0 var(--r) 0 80px;background:var(--teal-pale);opacity:0;transition:.35s;}
+    .svc-card:hover::after{opacity:1;}
+    .svc-card:hover{transform:translateY(-6px);box-shadow:var(--sh-lg);}
+    .svc-ico{width:58px;height:58px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:20px;position:relative;z-index:1;}
+    .ia{background:rgba(74,155,143,.12);}.ib{background:rgba(100,150,220,.10);}.ic{background:rgba(200,164,96,.12);}.id{background:rgba(200,100,150,.10);}
+    .svc-card h3{font-size:1.05rem;font-weight:700;color:var(--ink);position:relative;z-index:1;}
+    .svc-card p{font-size:.87rem;color:var(--muted);margin-top:10px;line-height:1.75;position:relative;z-index:1;}
+    .svc-lnk{display:inline-flex;align-items:center;gap:6px;margin-top:18px;color:var(--teal-dk);font-size:.87rem;font-weight:700;text-decoration:none;transition:gap .2s;position:relative;z-index:1;}
+    .svc-lnk:hover{gap:10px;}
+
+    /* TEAM */
+    .team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;margin-top:52px;}
+    .tc{background:#fff;border-radius:var(--r);padding:28px 20px;border:1px solid rgba(74,155,143,.10);box-shadow:var(--sh);text-align:center;transition:.35s;}
+    .tc:hover{transform:translateY(-6px);box-shadow:var(--sh-lg);border-color:rgba(74,155,143,.28);}
+    .tc-av{width:80px;height:80px;border-radius:22px;margin:0 auto 16px;background:var(--teal-soft);display:flex;align-items:center;justify-content:center;font-size:2.2rem;position:relative;}
+    .tc-dot{position:absolute;bottom:-3px;left:-3px;width:15px;height:15px;border-radius:50%;border:2.5px solid #fff;background:#3dbf80;}
+    .tc h3{font-size:1rem;font-weight:700;color:var(--ink);}
+    .tc .sp{font-size:.78rem;color:var(--muted);margin-top:4px;}
+    .tc-tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;}
+    .dtg{background:var(--teal-pale);color:var(--teal-dk);padding:3px 10px;border-radius:14px;font-size:.68rem;font-weight:700;}
+    .tc-btn{width:100%;margin-top:14px;background:var(--teal);color:#fff;border:none;padding:10px;border-radius:24px;font-family:'Cairo',sans-serif;font-size:.84rem;font-weight:700;cursor:pointer;transition:.25s;text-decoration:none;display:block;}
+    .tc-btn:hover{background:var(--teal-dk);}
+    .va{text-align:center;margin-top:40px;}
+    .btn-ol{display:inline-flex;align-items:center;gap:8px;border:1.5px solid rgba(74,155,143,.38);color:var(--teal-dk);background:transparent;padding:13px 32px;border-radius:30px;font-family:'Cairo',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none;transition:.3s;}
+    .btn-ol:hover{background:var(--teal-pale);border-color:var(--teal);}
+
+    /* HOW IT WORKS */
+    .how-sec{background:var(--warm);}
+    .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:60px;position:relative;}
+    .how-grid::before{content:'';position:absolute;top:44px;right:16.5%;left:16.5%;height:2px;background:linear-gradient(90deg,var(--teal-soft),var(--teal-lt),var(--teal-soft));}
+    .how-step{text-align:center;}
+    .how-n{width:88px;height:88px;border-radius:50%;margin:0 auto 22px;background:linear-gradient(135deg,var(--teal-dk),var(--teal-lt));display:flex;align-items:center;justify-content:center;font-family:'Tajawal',sans-serif;font-size:1.6rem;font-weight:900;color:#fff;box-shadow:0 6px 20px rgba(74,155,143,.28);position:relative;z-index:1;transition:transform .3s;}
+    .how-step:hover .how-n{transform:scale(1.08);}
+    .how-step h3{font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:8px;}
+    .how-step p{font-size:.85rem;color:var(--muted);line-height:1.7;max-width:200px;margin:0 auto;}
+
+    /* CTA */
+    .cta{background:linear-gradient(130deg,var(--teal-dk) 0%,var(--teal) 60%,var(--teal-lt) 100%);padding:80px 6%;text-align:center;color:#fff;position:relative;overflow:hidden;}
+    .cta-in{position:relative;z-index:1;max-width:700px;margin:0 auto;}
+    .cta h2{font-family:'Tajawal',sans-serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;}
+    .cta p{margin-top:12px;opacity:.85;font-size:1rem;line-height:1.7;}
+    .cta-btns{display:flex;gap:14px;justify-content:center;margin-top:36px;flex-wrap:wrap;}
+    .bwh{background:#fff;color:var(--teal-dk);padding:14px 34px;border-radius:30px;border:none;font-family:'Cairo',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;transition:.3s;box-shadow:0 4px 14px rgba(0,0,0,.12);}
+    .bwh:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.18);}
+    .bow{background:rgba(255,255,255,.15);color:#fff;padding:14px 28px;border-radius:30px;border:2px solid rgba(255,255,255,.44);font-family:'Cairo',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;transition:.3s;}
+    .bow:hover{background:rgba(255,255,255,.24);border-color:rgba(255,255,255,.7);}
+
+    /* FOOTER */
+    footer{background:var(--ink);color:rgba(255,255,255,.6);padding:64px 6% 28px;}
+    .fg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:44px;max-width:1240px;margin:0 auto 48px;}
+    .fb .logo-text{color:var(--teal-lt);}
+    .fb p{font-size:.86rem;line-height:1.8;margin-top:14px;max-width:280px;}
+    .socials{display:flex;gap:10px;margin-top:20px;}
+    .soc{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;transition:.2s;text-decoration:none;color:inherit;}
+    .soc:hover{background:rgba(74,155,143,.4);}
+    .fc h4{color:#fff;font-size:.92rem;font-weight:700;margin-bottom:18px;}
+    .fc ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+    .fc ul li a{color:rgba(255,255,255,.55);text-decoration:none;font-size:.85rem;transition:.2s;}
+    .fc ul li a:hover{color:var(--teal-lt);}
+    .fct li{display:flex;align-items:center;gap:8px;font-size:.85rem;}
+    .fb-bottom{max-width:1240px;margin:0 auto;border-top:1px solid rgba(255,255,255,.08);padding-top:24px;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;flex-wrap:wrap;gap:10px;}
+
+    /* CONTACT SECTION */
+    .contact-sec{background:#fff;}
+    .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:48px;align-items:start;}
+    .contact-info{display:flex;flex-direction:column;gap:20px;}
+    .ci-item{display:flex;align-items:flex-start;gap:16px;padding:20px;background:var(--warm);border-radius:var(--r-sm);border:1px solid rgba(74,155,143,.08);}
+    .ci-icon{width:46px;height:46px;border-radius:12px;background:var(--teal-pale);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+    .ci-text h5{font-size:.92rem;font-weight:700;color:var(--ink);}
+    .ci-text p{font-size:.83rem;color:var(--muted);margin-top:4px;line-height:1.6;}
+    .ci-text a{color:var(--teal-dk);text-decoration:none;font-weight:600;}
+    .contact-form{background:var(--warm);border-radius:var(--r);padding:30px;border:1px solid rgba(74,155,143,.10);}
+    .contact-form h4{font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:20px;}
+    .cf-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+    .cf-group label{font-size:.8rem;font-weight:700;color:var(--muted);}
+    .cf-group input,.cf-group textarea,.cf-group select{padding:12px 14px;border:1.5px solid var(--sand);border-radius:var(--r-sm);background:#fff;font-family:'Cairo',sans-serif;font-size:.9rem;color:var(--ink);outline:none;transition:.25s;width:100%;}
+    .cf-group input:focus,.cf-group textarea:focus,.cf-group select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(74,155,143,.12);}
+    .cf-group textarea{resize:vertical;min-height:100px;}
+    .cf-submit{width:100%;padding:14px;background:var(--teal);color:#fff;border:none;border-radius:30px;font-family:'Cairo',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:.3s;margin-top:6px;}
+    .cf-submit:hover{background:var(--teal-dk);}
+
+    /* ANIMATIONS */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:none;}}
+    @keyframes fadeLeft{from{opacity:0;transform:translateX(32px);}to{opacity:1;transform:none;}}
+    .rev{opacity:0;transform:translateY(28px);transition:opacity .7s,transform .7s;}
+    .rev.on{opacity:1;transform:none;}
+
+    /* RESPONSIVE */
+    @media(max-width:1000px){
+      .h-inner{grid-template-columns:1fr;padding:110px 5% 80px;}
+      .hv{display:none;}
+      .how-grid{grid-template-columns:1fr;}
+      .how-grid::before{display:none;}
+      nav,.h-cta{display:none;}
+      .burger{display:flex;}
+      .fg{grid-template-columns:1fr 1fr;}
+      .contact-grid{grid-template-columns:1fr;}
+    }
+    @media(max-width:640px){
+      .h-inner{padding:100px 5% 70px;}
+      .sec{padding:56px 5%;}
+      .hero h1{font-size:1.9rem;}
+      .trust-row{flex-wrap:wrap;width:100%;}
+      .trust-it{flex:1;min-width:80px;}
+      .svc-grid{grid-template-columns:1fr 1fr;}
+      .team-grid{grid-template-columns:1fr 1fr;}
+      .fg{grid-template-columns:1fr;}
+      .hero-btns{gap:10px;}
+      .btn-p,.btn-g{padding:13px 22px;font-size:.92rem;}
+      .cta-btns{flex-direction:column;align-items:center;}
+      .bwh,.bow{width:100%;text-align:center;}
+    }
+    @media(max-width:420px){
+      .svc-grid{grid-template-columns:1fr;}
+      .team-grid{grid-template-columns:1fr;}
+      .hero h1{font-size:1.7rem;}
+      .contact-form{padding:20px 16px;}
+      .fb-bottom{flex-direction:column;text-align:center;}
+    }
+  </style>
+</head>
+<body>
+
+<header id="hdr">
+  <a href="index.html" class="logo">
+    <div class="logo-mark">✂️</div>
+    <span class="logo-text">اختر  </span>
+  </a>
+  <nav>
+    <a href="index.html" class="act">الرئيسية</a>
+    <a href="doctors.html">فريق العمل</a>
+    <a href="booking.html">الحجز والشراء</a>
+    <a href="#ft">تواصل</a>
+  </nav>
+  <a href="booking.html" class="h-cta">اطلب الآن ←</a>
+  <div class="burger" onclick="toggleM()"><span></span><span></span><span></span></div>
+</header>
+<div class="mnav" id="mn">
+  <a href="index.html">🏠 الرئيسية</a>
+  <a href="doctors.html">👗 فريق العمل</a>
+  <a href="booking.html">🛍️ الحجز والشراء</a>
+  <a href="#ft">📞 تواصل</a>
+  <a href="booking.html" style="background:var(--teal);color:#fff;font-weight:700;text-align:center;margin-top:4px;">اطلب الآن ←</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hblob hb1"></div>
+  <div class="hblob hb2"></div>
+  <div class="h-inner">
+    <div>
+      <div class="hero-pill"><div class="pdot"></div> وجهتك الأولى للعبايات والفساتين الفاخرة</div>
+      <h1>أطلالتك <em>المثالية</em><br>بلمسة مميزة وتفصيل احترافي</h1>
+      <p class="hero-p">عبايات وفساتين مصممة بعناية حسب مقاساتك الدقيقة. اختاري قطعتك واطلبي بكل سهولة من منزلك.</p>
+      <div class="hero-btns">
+        <a href="booking.html" class="btn-p">🛍️ اطلبي الآن</a>
+        <a href="doctors.html" class="btn-g">👗 فريق العمل</a>
+      </div>
+      <div class="trust-row">
+        <div class="trust-it"><div class="trust-n">+500</div><div class="trust-l">قطعة مُصممة</div></div>
+        <div class="trust-sep"></div>
+        <div class="trust-it"><div class="trust-n">+2K</div><div class="trust-l">عميلة سعيدة</div></div>
+        <div class="trust-sep"></div>
+        <div class="trust-it"><div class="trust-n">99%</div><div class="trust-l">رضا العملاء</div></div>
+      </div>
+    </div>
+    <div class="hv">
+      <div class="hvc hv-emp">
+        <div class="hv-av">👩‍🎨</div>
+        <div class="hv-di">
+          <h4>نور محمد</h4>
+          <p>متخصصة العبايات والفساتين</p>
+          <span class="hv-badge">✓ متاحة الآن</span>
+        </div>
+      </div>
+      <div class="hvc">
+        <div class="hv-stitle">📋 خطوات الطلب السريع</div>
+        <div class="hv-steps">
+          <div class="hv-step"><div class="hv-sn">1</div><span>اختاري نوع الخدمة والقطعة</span></div>
+          <div class="hv-step"><div class="hv-sn">2</div><span>أدخلي اسم المنتج وكوده</span></div>
+          <div class="hv-step"><div class="hv-sn">3</div><span>أدخلي مقاساتك وأكدي الطلب</span></div>
+        </div>
+      </div>
+      <div class="hvc hv-row">
+        <div class="hv-ic">✂️</div>
+        <div class="hv-ri"><h5>تفصيل حسب مقاسك</h5><p>عباية، فستان، شيلة أو اكسسوارات</p></div>
+        <button class="hv-rbtn" onclick="location.href='booking.html'">اطلبي</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="sec svc-sec" id="services">
+  <div class="si">
+    <div class="scenter rev">
+      <div class="stag">خدماتنا</div>
+      <h2 class="stitle">كل ما تحتاجينه في مكان واحد</h2>
+      <p class="ssub cen">تصاميم فاخرة بأيدي متخصصات محترفات لإطلالة مميزة تناسب كل مناسبة</p>
+    </div>
+    <div class="svc-grid rev">
+      <div class="svc-card">
+        <div class="svc-ico ia">🖤</div>
+        <h3>تفصيل عبايات</h3>
+        <p>عبايات أنيقة بأفخر الخامات وتفصيل دقيق حسب مقاساتك. تناسب جميع المناسبات من الكاجوال للرسمي.</p>
+        <a href="booking.html" class="svc-lnk">اطلبي الآن ←</a>
+      </div>
+      <div class="svc-card">
+        <div class="svc-ico ib">👗</div>
+        <h3>تفصيل فساتين</h3>
+        <p>فساتين سهرة وزفاف وكاجوال بتصاميم عصرية وراقية تجعلك محط الأنظار في كل مناسبة.</p>
+        <a href="booking.html" class="svc-lnk">اطلبي الآن ←</a>
+      </div>
+      <div class="svc-card">
+        <div class="svc-ico ic">🧕</div>
+        <h3>شيلات واكسسوارات</h3>
+        <p>شيلات بأشكال وألوان متنوعة، واكسسوارات مميزة تكمل إطلالتك وتضيف لمسة جمال استثنائية.</p>
+        <a href="booking.html" class="svc-lnk">اكتشفي ←</a>
+      </div>
+      <div class="svc-card">
+        <div class="svc-ico id">✨</div>
+        <h3>أطقم متكاملة</h3>
+        <p>احصلي على طقم متكامل من عباية وفستان متناسقة في الخامة والتصميم لإطلالة متكاملة لا مثيل لها.</p>
+        <a href="booking.html" class="svc-lnk">اطلبي الآن ←</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM PREVIEW -->
+<section class="sec" id="team">
+  <div class="si">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;" class="rev">
+      <div>
+        <div class="stag">فريق العمل</div>
+        <h2 class="stitle">موظفاتنا المتخصصات</h2>
+        <p class="ssub">خبرات واسعة في عالم الأزياء والتفصيل لخدمتك باحترافية</p>
+      </div>
+      <a href="doctors.html" class="btn-ol">عرض فريق العمل كاملاً ←</a>
+    </div>
+    <div class="team-grid rev">
+      <div class="tc">
+        <div class="tc-av">👩<div class="tc-dot"></div></div>
+        <h3> ساره</h3><p class="sp">متخصصة العبايات والفساتين</p>
+        <div class="tc-tags"><span class="dtg">عبايات</span><span class="dtg">فساتين</span></div>
+        <a href="booking.html" class="tc-btn">اطلبي الآن</a>
+      </div>
+      <div class="tc">
+        <div class="tc-av">👩‍💼<div class="tc-dot"></div></div>
+        <h3>نور </h3><p class="sp">متخصصة التفصيل والاكسسوارات</p>
+        <div class="tc-tags"><span class="dtg">تفصيل</span><span class="dtg">اكسسوارات</span></div>
+        <a href="booking.html" class="tc-btn">اطلبي الآن</a>
+      </div>
+      <div class="tc">
+        <div class="tc-av">👩‍🎨<div class="tc-dot"></div></div>
+        <h3>ضحى </h3><p class="sp">مستشارة الأزياء والشيل</p>
+        <div class="tc-tags"><span class="dtg">أزياء</span><span class="dtg">شيل</span></div>
+        <a href="booking.html" class="tc-btn">اطلبي الآن</a>
+      </div>
+      <div class="tc">
+        <div class="tc-av">👩‍🎨<div class="tc-dot"></div></div>
+        <h3>غاده </h3><p class="sp">مستشارة الأزياء والشيل</p>
+        <div class="tc-tags"><span class="dtg">أزياء</span><span class="dtg">شيل</span></div>
+        <a href="booking.html" class="tc-btn">اطلبي الآن</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="sec how-sec" id="how">
+  <div class="si">
+    <div class="scenter rev">
+      <div class="stag">كيف يعمل</div>
+      <h2 class="stitle">اطلبي قطعتك في 3 خطوات بسيطة</h2>
+      <p class="ssub cen">عملية سهلة وسريعة تستغرق أقل من دقيقتين لإتمام طلبك</p>
+    </div>
+    <div class="how-grid rev">
+      <div class="how-step">
+        <div class="how-n">١</div>
+        <h3>اختاري الخدمة</h3>
+        <p>حددي نوع القطعة (عباية، فستان، شيلة...) والموظفة المناوبة</p>
+      </div>
+      <div class="how-step">
+        <div class="how-n">٢</div>
+        <h3>أدخلي التفاصيل</h3>
+        <p>اكتبي اسم القطعة وكودها ومقاساتك الدقيقة (طول - عرض - كم - صدر)</p>
+      </div>
+      <div class="how-step">
+        <div class="how-n">٣</div>
+        <h3>استلمي طلبك</h3>
+        <p>يتواصل معك فريقنا فوراً لتأكيد التفاصيل وتحديد موعد الاستلام</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="cta-in">
+    <h2>ابدئي رحلتك مع ختر  اليوم</h2>
+    <p>انضمي لآلاف العميلات اللواتي يثقن في تصاميمنا الفاخرة وخدمتنا الاحترافية</p>
+    <div class="cta-btns">
+      <a href="booking.html" class="bwh">🛍️ اطلبي الآن</a>
+      <a href="doctors.html" class="bow">👗 فريق العمل</a>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT SECTION -->
+<section class="sec contact-sec" id="contact">
+  <div class="si">
+    <div class="scenter rev">
+      <div class="stag">تواصل معنا</div>
+      <h2 class="stitle">نحن هنا لخدمتك</h2>
+      <p class="ssub cen">تواصلي معنا لأي استفسار أو طلب خاص وسنرد عليك في أقرب وقت</p>
+    </div>
+    <div class="contact-grid rev">
+      <div class="contact-info">
+        <div class="ci-item">
+          <div class="ci-icon">📞</div>
+          <div class="ci-text">
+            <h5>رقم الهاتف</h5>
+            <p><a href="tel:+201000000000">01000000000</a></p>
+          </div>
+        </div>
+        <div class="ci-item">
+          <div class="ci-icon">📱</div>
+          <div class="ci-text">
+            <h5>واتساب</h5>
+            <p><a href="https://wa.me/201000000000">تواصلي عبر واتساب</a></p>
+          </div>
+        </div>
+        <div class="ci-item">
+          <div class="ci-icon">📧</div>
+          <div class="ci-text">
+            <h5>البريد الإلكتروني</h5>
+            <p><a href="mailto:info@khtartabib.com">info@khtartabib.com</a></p>
+          </div>
+        </div>
+        <div class="ci-item">
+          <div class="ci-icon">📍</div>
+          <div class="ci-text">
+            <h5>العنوان</h5>
+            <p>القاهرة، جمهورية مصر العربية</p>
+          </div>
+        </div>
+        <div class="ci-item">
+          <div class="ci-icon">🕐</div>
+          <div class="ci-text">
+            <h5>ساعات العمل</h5>
+            <p>السبت – الخميس: 10 ص – 10 م<br>الجمعة: 2 م – 10 م</p>
+          </div>
+        </div>
+      </div>
+      <div class="contact-form">
+        <h4>📩 أرسلي رسالة</h4>
+        <div class="cf-group">
+          <label>الاسم</label>
+          <input type="text" placeholder="اسمك الكريم"/>
+        </div>
+        <div class="cf-group">
+          <label>رقم الهاتف</label>
+          <input type="tel" placeholder="01X XXXX XXXX"/>
+        </div>
+        <div class="cf-group">
+          <label>الموضوع</label>
+          <select>
+            <option>استفسار عن منتج</option>
+            <option>طلب تفصيل</option>
+            <option>متابعة طلب سابق</option>
+            <option>شكوى أو اقتراح</option>
+          </select>
+        </div>
+        <div class="cf-group">
+          <label>الرسالة</label>
+          <textarea placeholder="اكتبي رسالتك هنا..."></textarea>
+        </div>
+        <button class="cf-submit" onclick="alert('تم إرسال رسالتك بنجاح! سنتواصل معك قريباً 💚')">إرسال الرسالة ←</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="ft">
+  <div class="fg">
+    <div class="fb">
+      <a href="index.html" class="logo"><div class="logo-mark">✂️</div><span class="logo-text">اختر </span></a>
+      <p>وجهتك الأولى للعبايات والفساتين الفاخرة. نصمم إطلالتك بعناية واحترافية عالية حسب مقاساتك.</p>
+      <div class="socials">
+        <a class="soc" href="#">📘</a>
+        <a class="soc" href="#">📸</a>
+        <a class="soc" href="#">🎵</a>
+        <a class="soc" href="#">💬</a>
+      </div>
+    </div>
+    <div class="fc">
+      <h4>روابط سريعة</h4>
+      <ul>
+        <li><a href="index.html">الرئيسية</a></li>
+        <li><a href="doctors.html">فريق العمل</a></li>
+        <li><a href="booking.html">الحجز والشراء</a></li>
+        <li><a href="#contact">تواصل معنا</a></li>
+      </ul>
+    </div>
+    <div class="fc">
+      <h4>خدماتنا</h4>
+      <ul>
+        <li><a href="booking.html">تفصيل عبايات</a></li>
+        <li><a href="booking.html">تفصيل فساتين</a></li>
+        <li><a href="booking.html">شيلات</a></li>
+        <li><a href="booking.html">اكسسوارات</a></li>
+      </ul>
+    </div>
+    <div class="fc fct">
+      <h4>تواصل معنا</h4>
+      <ul>
+        <li><span>📞</span><a href="tel:+201000000000">01000000000</a></li>
+        <li><span>📱</span><a href="https://wa.me/201000000000">واتساب</a></li>
+        <li><span>📧</span><a href="mailto:info@khtartabib.com">info@khtartabib.com</a></li>
+        <li><span>📍</span><span>القاهرة، مصر</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="fb-bottom">
+    <span>&#169; 2025 اختر . جميع الحقوق محفوظة.</span>
+    <span>تم التصميم بـ &#10084;&#65039; لأناقتك</span>
+  </div>
+</footer>
+
+<script>
+  window.addEventListener('scroll', function() {
+    document.getElementById('hdr').classList.toggle('scrolled', window.scrollY > 20);
+  });
+  function toggleM() {
+    document.getElementById('mn').classList.toggle('open');
+  }
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('on'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.rev').forEach(function(el) { io.observe(el); });
+</script>
+</body>
+</html>

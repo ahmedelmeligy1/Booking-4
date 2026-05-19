@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>فريق العمل | ختر الطبيب</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --teal:#4a9b8f;--teal-lt:#6fb8ad;--teal-dk:#2e7a6e;
+      --teal-pale:#e4f4f1;--teal-soft:#c8e9e4;
+      --cream:#faf9f6;--warm:#f4f1ec;--sand:#e8e0d4;--sand-lt:#c0b4a4;
+      --ink:#1e2d2a;--ink-mid:#3d5450;--muted:#647872;--faint:#9db4af;
+      --sh:0 2px 20px rgba(46,122,110,.09);--sh-lg:0 8px 40px rgba(46,122,110,.14);
+      --r:18px;--r-sm:12px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Cairo',sans-serif;background:var(--cream);color:var(--ink);}
+    ::-webkit-scrollbar{width:5px;}
+    ::-webkit-scrollbar-thumb{background:var(--teal-lt);border-radius:3px;}
+
+    /* NAV */
+    header{position:sticky;top:0;z-index:99;background:rgba(250,249,246,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(74,155,143,.13);height:72px;display:flex;align-items:center;padding:0 6%;justify-content:space-between;}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .lm{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--teal-dk),var(--teal-lt));display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 12px rgba(74,155,143,.3);}
+    .lt{font-family:'Tajawal',sans-serif;font-size:1.5rem;font-weight:900;color:var(--teal-dk);}
+    nav{display:flex;gap:4px;}
+    nav a{text-decoration:none;color:var(--muted);font-size:.9rem;font-weight:500;padding:8px 16px;border-radius:30px;transition:.25s;}
+    nav a:hover,nav a.act{color:var(--teal-dk);background:var(--teal-pale);}
+    nav a.act{font-weight:700;}
+    .hcta{background:var(--teal);color:#fff;padding:10px 24px;border-radius:30px;font-weight:700;font-size:.9rem;text-decoration:none;box-shadow:0 4px 14px rgba(74,155,143,.34);transition:.3s;}
+    .hcta:hover{background:var(--teal-dk);}
+    .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;}
+    .burger span{display:block;width:24px;height:2px;background:var(--ink-mid);border-radius:2px;}
+    .mnav{display:none;position:fixed;top:72px;inset-inline:0;background:var(--cream);border-bottom:1px solid var(--sand);padding:12px 6%;flex-direction:column;gap:4px;z-index:98;box-shadow:0 8px 24px rgba(0,0,0,.07);}
+    .mnav.open{display:flex;}
+    .mnav a{text-decoration:none;color:var(--muted);font-size:.95rem;padding:11px 14px;border-radius:var(--r-sm);transition:.2s;}
+    .mnav a:hover{background:var(--teal-pale);color:var(--teal-dk);}
+
+    /* PAGE HEADER */
+    .ph{background:linear-gradient(135deg,var(--teal-dk) 0%,var(--teal) 100%);padding:52px 6%;color:#fff;position:relative;overflow:hidden;}
+    .ph::after{content:'';position:absolute;bottom:-30px;right:-30px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.06);}
+    .ph-in{max-width:1240px;margin:0 auto;position:relative;z-index:1;}
+    .ph h1{font-family:'Tajawal',sans-serif;font-size:clamp(1.7rem,3.5vw,2.6rem);font-weight:900;}
+    .ph p{margin-top:10px;opacity:.85;font-size:1rem;max-width:520px;line-height:1.7;}
+    .ph-stats{display:flex;gap:32px;margin-top:28px;flex-wrap:wrap;}
+    .ph-stat{text-align:center;}
+    .ph-stat strong{display:block;font-family:'Tajawal',sans-serif;font-size:1.5rem;font-weight:900;}
+    .ph-stat span{font-size:.76rem;opacity:.8;}
+
+    /* SEARCH BAR */
+    .search-wrap{background:#fff;border-bottom:1px solid var(--sand);padding:20px 6%;position:sticky;top:72px;z-index:90;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+    .search-in{max-width:1240px;margin:0 auto;display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+    .search-box{flex:1;min-width:240px;display:flex;align-items:center;gap:10px;background:var(--warm);border:1.5px solid var(--sand);border-radius:30px;padding:12px 20px;transition:.25s;}
+    .search-box:focus-within{border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px rgba(74,155,143,.12);}
+    .search-box span{font-size:1.1rem;color:var(--faint);}
+    .search-box input{flex:1;border:none;background:transparent;font-family:'Cairo',sans-serif;font-size:.95rem;color:var(--ink);outline:none;}
+    .search-box input::placeholder{color:var(--sand-lt);}
+    .sort-sel{padding:12px 20px;border:1.5px solid var(--sand);border-radius:30px;background:var(--warm);font-family:'Cairo',sans-serif;font-size:.88rem;color:var(--ink-mid);outline:none;cursor:pointer;transition:.25s;}
+    .sort-sel:focus{border-color:var(--teal);}
+
+    /* LAYOUT */
+    .page-body{max-width:1240px;margin:0 auto;padding:32px 6% 80px;display:grid;grid-template-columns:240px 1fr;gap:28px;}
+
+    /* FILTERS SIDEBAR */
+    .filter-panel{display:flex;flex-direction:column;gap:16px;position:sticky;top:160px;height:fit-content;}
+    .fp-card{background:#fff;border-radius:var(--r);border:1px solid rgba(74,155,143,.10);box-shadow:var(--sh);overflow:hidden;}
+    .fp-hd{padding:16px 18px 14px;border-bottom:1px solid rgba(74,155,143,.10);display:flex;align-items:center;justify-content:space-between;}
+    .fp-hd h4{font-size:.9rem;font-weight:700;color:var(--ink);}
+    .fp-hd button{border:none;background:transparent;color:var(--teal-dk);font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;}
+    .fp-body{padding:16px 18px;}
+    .filter-chips{display:flex;flex-wrap:wrap;gap:8px;}
+    .fchip{padding:7px 14px;border-radius:20px;border:1.5px solid var(--sand);background:transparent;color:var(--muted);font-family:'Cairo',sans-serif;font-size:.8rem;font-weight:500;cursor:pointer;transition:.2s;}
+    .fchip.on,.fchip:hover{background:var(--teal);border-color:var(--teal);color:#fff;}
+    .avail-toggle{display:flex;align-items:center;justify-content:space-between;}
+    .avail-toggle label{font-size:.88rem;color:var(--ink-mid);font-weight:500;}
+    .toggle{position:relative;width:44px;height:24px;}
+    .toggle input{opacity:0;width:0;height:0;}
+    .slider{position:absolute;inset:0;background:var(--sand);border-radius:24px;cursor:pointer;transition:.3s;}
+    .slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s;}
+    .toggle input:checked+.slider{background:var(--teal);}
+    .toggle input:checked+.slider::before{transform:translateX(20px);}
+
+    /* TEAM GRID */
+    .docs-area{display:flex;flex-direction:column;gap:20px;}
+    .results-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+    .results-bar p{font-size:.88rem;color:var(--muted);}
+    .view-toggle{display:flex;gap:6px;}
+    .vt-btn{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--sand);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:.2s;}
+    .vt-btn.on{border-color:var(--teal);background:var(--teal-pale);color:var(--teal-dk);}
+    .doctors-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;}
+    .doctors-list.list-view{grid-template-columns:1fr;}
+
+    /* EMPLOYEE CARD (grid) */
+    .doc-card{background:#fff;border-radius:var(--r);border:1px solid rgba(74,155,143,.10);box-shadow:var(--sh);overflow:hidden;transition:all .35s;cursor:default;}
+    .doc-card:hover{transform:translateY(-5px);box-shadow:var(--sh-lg);border-color:rgba(74,155,143,.26);}
+    .doc-card .dc-top{padding:24px 20px 18px;text-align:center;border-bottom:1px solid rgba(74,155,143,.08);}
+    .doc-av{width:72px;height:72px;border-radius:18px;margin:0 auto 14px;background:linear-gradient(135deg,var(--teal-soft),var(--teal-lt));display:flex;align-items:center;justify-content:center;font-size:2.2rem;position:relative;}
+    .avdot{position:absolute;bottom:-3px;left:-3px;width:14px;height:14px;border-radius:50%;border:2.5px solid #fff;background:#3dbf80;}
+    .avdot.off{background:var(--sand-lt);}
+    .doc-card h3{font-size:.98rem;font-weight:700;color:var(--ink);}
+    .doc-card .sp{font-size:.76rem;color:var(--muted);margin-top:3px;}
+    .doc-tags{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:8px;}
+    .dtg{background:var(--teal-pale);color:var(--teal-dk);padding:2px 9px;border-radius:12px;font-size:.66rem;font-weight:700;}
+    .doc-card .dc-bot{padding:14px 20px;}
+    .dbk{width:100%;background:var(--teal);color:#fff;border:none;padding:11px 8px;border-radius:22px;font-family:'Cairo',sans-serif;font-size:.84rem;font-weight:700;cursor:pointer;transition:background .25s;text-decoration:none;display:flex;align-items:center;justify-content:center;}
+    .dbk:hover{background:var(--teal-dk);}
+
+    /* list card override */
+    .doc-card.lcard{display:flex;align-items:center;}
+    .lcard .dc-top{display:flex;align-items:center;gap:20px;text-align:right;border-bottom:none;border-left:1px solid rgba(74,155,143,.08);flex:1;padding:20px 24px;}
+    .lcard .doc-av{margin:0;flex-shrink:0;}
+    .lcard .dc-info{flex:1;}
+    .lcard .dc-bot{border-left:1px solid rgba(74,155,143,.08);padding:20px;flex-direction:column;width:160px;flex-shrink:0;display:flex;}
+    .lcard .doc-tags{justify-content:flex-start;}
+    .lcard .dc-extra{font-size:.78rem;color:var(--muted);margin-top:4px;}
+    .lcard .dc-extra span{display:inline-flex;align-items:center;gap:4px;margin-left:10px;}
+
+    /* NO RESULTS */
+    .no-results{text-align:center;padding:60px 20px;color:var(--faint);}
+    .no-results span{font-size:3rem;display:block;margin-bottom:16px;}
+
+    @media(max-width:900px){
+      .page-body{grid-template-columns:1fr;}
+      .filter-panel{position:static;display:none;}
+      .filter-panel.mob-open{display:flex;}
+      nav,.hcta{display:none;}
+      .burger{display:flex;}
+    }
+    @media(max-width:600px){
+      .ph{padding:32px 5%;}
+      .page-body{padding:20px 4% 60px;}
+      .search-wrap{padding:12px 4%;}
+      .ph h1{font-size:1.5rem;}
+    }
+    @media(max-width:420px){
+      .ph{padding:24px 5%;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a href="index.html" class="logo">
+    <div class="lm">✂️</div>
+    <span class="lt">اختر </span>
+  </a>
+  <nav>
+    <a href="index.html">الرئيسية</a>
+    <a href="doctors.html" class="act">فريق العمل</a>
+    <a href="booking.html">الحجز والشراء</a>
+    <a href="index.html#ft">تواصل</a>
+  </nav>
+  <a href="booking.html" class="hcta">اطلبي الآن ←</a>
+  <div class="burger" onclick="toggleM()"><span></span><span></span><span></span></div>
+</header>
+<div class="mnav" id="mn">
+  <a href="index.html">🏠 الرئيسية</a>
+  <a href="doctors.html">👗 فريق العمل</a>
+  <a href="booking.html">🛍️ الحجز والشراء</a>
+  <a href="index.html#ft">📞 تواصل</a>
+  <a href="booking.html" style="background:var(--teal);color:#fff;font-weight:700;text-align:center;margin-top:4px;">اطلبي الآن ←</a>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="ph">
+  <div class="ph-in">
+    <h1>👗 فريق العمل المتخصص</h1>
+    <p>تعرفي على موظفاتنا المتخصصات في عالم الأزياء والتفصيل — كل واحدة منهن تضع بصمتها في كل قطعة</p>
+    <div class="ph-stats">
+      <div class="ph-stat"><strong>+5</strong><span>موظفة متخصصة</span></div>
+      <div class="ph-stat"><strong>+5</strong><span>تخصصات مختلفة</span></div>
+      <div class="ph-stat"><strong>99%</strong><span>رضا العملاء</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SEARCH BAR -->
+<div class="search-wrap">
+  <div class="search-in">
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" id="searchIn" placeholder="ابحثي عن موظفة أو تخصص..." oninput="filterTeam()"/>
+    </div>
+    <select class="sort-sel" onchange="sortTeam(this.value)">
+      <option value="name">الاسم أبجدياً</option>
+      <option value="avail">المتاحة أولاً</option>
+      <option value="spec">حسب التخصص</option>
+    </select>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="page-body">
+
+  <!-- FILTERS -->
+  <aside class="filter-panel" id="fp">
+    <div class="fp-card">
+      <div class="fp-hd"><h4>التخصص</h4><button onclick="clearSpec()">مسح</button></div>
+      <div class="fp-body">
+        <div class="filter-chips" id="specChips">
+          <button class="fchip on" data-spec="all" onclick="setSpec(this)">الكل</button>
+          <button class="fchip" data-spec="عبايات" onclick="setSpec(this)">عبايات</button>
+          <button class="fchip" data-spec="فساتين" onclick="setSpec(this)">فساتين</button>
+          <button class="fchip" data-spec="شيل" onclick="setSpec(this)">شيلات</button>
+          <button class="fchip" data-spec="اكسسوارات" onclick="setSpec(this)">اكسسوارات</button>
+          <button class="fchip" data-spec="تفصيل" onclick="setSpec(this)">تفصيل</button>
+        </div>
+      </div>
+    </div>
+    <div class="fp-card">
+      <div class="fp-hd"><h4>الإتاحة</h4></div>
+      <div class="fp-body">
+        <div class="avail-toggle">
+          <label>متاحة الآن فقط</label>
+          <label class="toggle"><input type="checkbox" id="availOnly" onchange="filterTeam()"><span class="slider"></span></label>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- TEAM LIST -->
+  <div class="docs-area">
+    <div class="results-bar">
+      <p id="resultCount">عرض <strong>5</strong> موظفة</p>
+      <div class="view-toggle">
+        <button class="vt-btn on" id="gridBtn" onclick="setView('grid')" title="شبكة">⊞</button>
+        <button class="vt-btn" id="listBtn" onclick="setView('list')" title="قائمة">☰</button>
+      </div>
+    </div>
+    <div class="doctors-list" id="teamList"></div>
+  </div>
+</div>
+
+<script>
+const TEAM=[
+  {name:'ساره ',spec:'عبايات',specLabel:'متخصصة العبايات والفساتين',icon:'👩',tags:['عبايات','فساتين','كاب'],exp:7,avail:true},
+  {name:'نور ',spec:'تفصيل',specLabel:'متخصصة التفصيل والاكسسوارات',icon:'👩‍💼',tags:['تفصيل','اكسسوارات','خياطة'],exp:5,avail:true},
+  {name:' آيه',spec:'شيل',specLabel:'مستشارة الأزياء والشيلات',icon:'👩‍🎨',tags:['شيل','أزياء','استايل'],exp:6,avail:true},
+  {name:' ناديه',spec:'فساتين',specLabel:'متخصصة فساتين السهرة والزفاف',icon:'👸',tags:['فساتين','سهرة','زفاف'],exp:8,avail:false},
+  {name:' ضحى',spec:'اكسسوارات',specLabel:'متخصصة الاكسسوارات والإكمالات',icon:'💁‍♀️',tags:['اكسسوارات','حقائب','مجوهرات'],exp:4,avail:true},
+  {name:' غاده',spec:'اكسسوارات',specLabel:'متخصصة الاكسسوارات والإكمالات',icon:'💁‍♀️',tags:['اكسسوارات','حقائب','مجوهرات'],exp:4,avail:true},
+];
+
+let currentSpec='all', currentView='grid';
+
+function renderCard(d,view){
+  if(view==='list'){
+    return `<div class="doc-card lcard">
+      <div class="dc-top">
+        <div class="doc-av">${d.icon}${d.avail?'<div class="avdot"></div>':'<div class="avdot off"></div>'}</div>
+        <div class="dc-info">
+          <h3>${d.name}</h3>
+          <p class="sp">${d.specLabel}</p>
+          <div class="doc-tags">${d.tags.map(t=>`<span class="dtg">${t}</span>`).join('')}</div>
+          <p class="dc-extra"><span>✂️ ${d.exp} سنوات خبرة</span><span>${d.avail?'🟢 متاحة الآن':'🟠 غير متاحة'}</span></p>
+        </div>
+      </div>
+      <div class="dc-bot">
+        <a href="booking.html" class="dbk">اطلبي الآن</a>
+      </div>
+    </div>`;
+  }
+  return `<div class="doc-card">
+    <div class="dc-top">
+      <div class="doc-av">${d.icon}${d.avail?'<div class="avdot"></div>':'<div class="avdot off"></div>'}</div>
+      <h3>${d.name}</h3>
+      <p class="sp">${d.specLabel}</p>
+      <div class="doc-tags">${d.tags.map(t=>`<span class="dtg">${t}</span>`).join('')}</div>
+    </div>
+    <div class="dc-bot">
+      <a href="booking.html" class="dbk">اطلبي الآن</a>
+    </div>
+  </div>`;
+}
+
+function filterTeam(){
+  const q=document.getElementById('searchIn').value.trim().toLowerCase();
+  const availOnly=document.getElementById('availOnly').checked;
+  let filtered=TEAM.filter(d=>{
+    if(currentSpec!=='all' && d.spec!==currentSpec) return false;
+    if(availOnly && !d.avail) return false;
+    if(q && !d.name.includes(q) && !d.specLabel.includes(q) && !d.tags.some(t=>t.includes(q))) return false;
+    return true;
+  });
+  document.getElementById('resultCount').innerHTML=`عرض <strong>${filtered.length}</strong> موظفة`;
+  const list=document.getElementById('teamList');
+  list.innerHTML=filtered.length?filtered.map(d=>renderCard(d,currentView)).join(''):`<div class="no-results" style="grid-column:1/-1;"><span>🔍</span><p>لم يتم العثور على موظفة مطابقة. جربي تغيير معايير البحث.</p></div>`;
+}
+
+function setSpec(btn){
+  document.querySelectorAll('.fchip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  currentSpec=btn.dataset.spec;
+  filterTeam();
+}
+
+function clearSpec(){
+  currentSpec='all';
+  document.querySelectorAll('.fchip').forEach(b=>b.classList.remove('on'));
+  document.querySelector('[data-spec="all"]').classList.add('on');
+  filterTeam();
+}
+
+function setView(v){
+  currentView=v;
+  const list=document.getElementById('teamList');
+  if(v==='list'){list.classList.add('list-view');document.getElementById('listBtn').classList.add('on');document.getElementById('gridBtn').classList.remove('on');}
+  else{list.classList.remove('list-view');document.getElementById('gridBtn').classList.add('on');document.getElementById('listBtn').classList.remove('on');}
+  filterTeam();
+}
+
+function sortTeam(v){
+  if(v==='name') TEAM.sort((a,b)=>a.name.localeCompare(b.name,'ar'));
+  else if(v==='avail') TEAM.sort((a,b)=>b.avail-a.avail);
+  else if(v==='spec') TEAM.sort((a,b)=>a.spec.localeCompare(b.spec,'ar'));
+  filterTeam();
+}
+
+function toggleM(){document.getElementById('mn').classList.toggle('open');}
+
+filterTeam();
+</script>
+</body>
+</html>
